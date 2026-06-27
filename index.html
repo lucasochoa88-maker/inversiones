@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio · Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg:       #0a0e14;
+    --surface:  #111720;
+    --card:     #161d29;
+    --border:   #1e2a3a;
+    --accent:   #00c896;
+    --accent2:  #3d8fff;
+    --warn:     #ff6b4a;
+    --gold:     #f0b429;
+    --muted:    #4a5568;
+    --text:     #c8d6e8;
+    --text-dim: #6b7f96;
+    --text-hi:  #eaf2ff;
+    --mono:     'IBM Plex Mono', monospace;
+    --sans:     'IBM Plex Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ── LAYOUT ── */
+  .shell { display: flex; min-height: 100vh; }
+
+  nav {
+    width: 52px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0;
+    gap: 4px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    flex-shrink: 0;
+  }
+
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 2px;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-icon {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text-dim);
+    font-size: 16px;
+    transition: all .15s;
+    text-decoration: none;
+    border: none; background: transparent;
+  }
+  .nav-icon:hover, .nav-icon.active { background: var(--border); color: var(--accent); }
+
+  main {
+    flex: 1;
+    padding: 20px 24px;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .topbar-left { display: flex; align-items: baseline; gap: 12px; }
+  .page-title { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; }
+
+  .live-badge {
+    display: flex; align-items: center; gap: 5px;
+    font-family: var(--mono); font-size: 10px; color: var(--accent);
+    background: rgba(0,200,150,.08);
+    border: 1px solid rgba(0,200,150,.2);
+    padding: 2px 8px; border-radius: 3px;
+  }
+  .live-dot { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .dolar-chip {
+    font-family: var(--mono); font-size: 11px;
+    padding: 4px 10px; border-radius: 4px;
+    background: var(--card); border: 1px solid var(--border);
+  }
+  .dolar-chip span { color: var(--text-dim); }
+  .dolar-chip strong { color: var(--gold); }
+
+  .last-update { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex; gap: 2px;
+    margin-bottom: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 3px;
+    width: fit-content;
+  }
+
+  .tab {
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    color: var(--text-dim);
+    border: none; background: transparent;
+    transition: all .15s;
+    font-family: var(--sans);
+  }
+  .tab.active { background: var(--card); color: var(--text-hi); }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  /* ── PANELS ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── KPI STRIP ── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .kpi {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .kpi.green::before { background: var(--accent); }
+  .kpi.blue::before  { background: var(--accent2); }
+  .kpi.gold::before  { background: var(--gold); }
+  .kpi.red::before   { background: var(--warn); }
+
+  .kpi-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+  .kpi-value { font-family: var(--mono); font-size: 22px; font-weight: 600; color: var(--text-hi); line-height: 1; }
+  .kpi-sub { font-family: var(--mono); font-size: 10px; color: var(--text-dim); margin-top: 4px; }
+  .kpi-delta { font-family: var(--mono); font-size: 11px; margin-top: 4px; }
+  .pos { color: var(--accent); }
+  .neg { color: var(--warn); }
+
+  /* ── GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .span-2 { grid-column: span 2; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .card-title { font-family: var(--mono); font-size: 10px; color: var(--text-dim); letter-spacing: 1.5px; text-transform: uppercase; }
+  .card-badge { font-family: var(--mono); font-size: 9px; padding: 2px 6px; border-radius: 3px; }
+  .badge-green { background: rgba(0,200,150,.12); color: var(--accent); border: 1px solid rgba(0,200,150,.25); }
+  .badge-blue  { background: rgba(61,143,255,.12); color: var(--accent2); border: 1px solid rgba(61,143,255,.25); }
+  .badge-gold  { background: rgba(240,180,41,.12); color: var(--gold); border: 1px solid rgba(240,180,41,.25); }
+  .badge-red   { background: rgba(255,107,74,.12); color: var(--warn); border: 1px solid rgba(255,107,74,.25); }
+
+  .card-body { padding: 14px 16px; }
+
+  /* ── TABLE ── */
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th {
+    font-family: var(--mono); font-size: 9px; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 1.2px;
+    padding: 0 10px 10px 0; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table th:last-child, .data-table td:last-child { text-align: right; padding-right: 0; }
+  .data-table td {
+    font-family: var(--mono); font-size: 12px; color: var(--text);
+    padding: 9px 10px 9px 0;
+    border-bottom: 1px solid rgba(30,42,58,.6);
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: rgba(255,255,255,.02); }
+
+  .ticker { color: var(--text-hi); font-weight: 600; }
+  .broker-tag {
+    font-size: 9px; padding: 1px 5px; border-radius: 2px;
+    background: var(--surface); color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+
+  /* ── CHART PLACEHOLDER ── */
+  .chart-area {
+    height: 160px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .chart-svg { width: 100%; height: 100%; }
+
+  /* ── DONUT ── */
+  .donut-wrap { display: flex; align-items: center; gap: 20px; padding: 14px 16px; }
+  .donut-svg { width: 100px; height: 100px; flex-shrink: 0; }
+  .donut-legend { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .legend-pct { color: var(--text-hi); font-weight: 600; margin-left: auto; }
+
+  /* ── SPARKLINE ROW ── */
+  .spark-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(30,42,58,.6); }
+  .spark-row:last-child { border-bottom: none; }
+  .spark-ticker { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--text-hi); width: 48px; }
+  .spark-price { font-family: var(--mono); font-size: 12px; width: 70px; }
+  .spark-change { font-family: var(--mono); font-size: 11px; width: 50px; text-align: right; }
+  .sparkline { flex: 1; height: 30px; }
+
+  /* ── PROGRESS ── */
+  .goal-item { padding: 12px 0; border-bottom: 1px solid rgba(30,42,58,.6); }
+  .goal-item:last-child { border-bottom: none; }
+  .goal-header { display: flex; justify-content: space-between; margin-bottom: 6px; font-family: var(--mono); font-size: 11px; }
+  .goal-name { color: var(--text); }
+  .goal-pct { color: var(--text-hi); font-weight: 600; }
+  .progress-bar { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width .5s ease; }
+  .goal-sub { display: flex; justify-content: space-between; margin-top: 5px; font-family: var(--mono); font-size: 9px; color: var(--text-dim); }
+
+  /* ── NEWS ── */
+  .news-item { padding: 12px 0; border-bottom: 1px solid rgba(30,42,58,.6); display: flex; gap: 10px; }
+  .news-item:last-child { border-bottom: none; }
+  .news-tag { font-family: var(--mono); font-size: 9px; padding: 2px 6px; border-radius: 2px; flex-shrink: 0; height: fit-content; }
+  .news-title { font-size: 12px; color: var(--text); line-height: 1.4; margin-bottom: 3px; }
+  .news-meta { font-family: var(--mono); font-size: 9px; color: var(--muted); }
+
+  /* ── PROJECTION ── */
+  .proj-scenario { padding: 12px 14px; border-radius: 7px; border: 1px solid var(--border); margin-bottom: 8px; }
+  .proj-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+  .proj-value { font-family: var(--mono); font-size: 18px; font-weight: 600; }
+  .proj-sub { font-family: var(--mono); font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── CONEXIONES ── */
+  .broker-card {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px; border-radius: 7px; border: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .broker-info { display: flex; align-items: center; gap: 12px; }
+  .broker-icon { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .broker-name { font-size: 13px; font-weight: 500; color: var(--text-hi); }
+  .broker-detail { font-family: var(--mono); font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .status-connected { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  .status-pending   { background: var(--gold); }
+  .status-manual    { background: var(--muted); }
+
+  .btn {
+    font-family: var(--mono); font-size: 10px; padding: 5px 12px;
+    border-radius: 4px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text-dim);
+    cursor: pointer; transition: all .15s;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary { background: rgba(0,200,150,.1); border-color: rgba(0,200,150,.3); color: var(--accent); }
+
+  /* ── STAT MINI ── */
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-mini { background: var(--surface); border-radius: 6px; padding: 10px 12px; border: 1px solid var(--border); }
+  .stat-mini-label { font-family: var(--mono); font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+  .stat-mini-value { font-family: var(--mono); font-size: 14px; font-weight: 600; color: var(--text-hi); margin-top: 2px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .span-2 { grid-column: span 1; }
+    .kpi-row { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- SIDEBAR NAV -->
+  <nav>
+    <div class="nav-logo">PF</div>
+    <button class="nav-icon active" onclick="showTab('resumen')" title="Resumen">⬡</button>
+    <button class="nav-icon" onclick="showTab('portfolio')" title="Portfolio">◈</button>
+    <button class="nav-icon" onclick="showTab('mercado')" title="Mercado">◲</button>
+    <button class="nav-icon" onclick="showTab('proyecciones')" title="Proyecciones">△</button>
+    <button class="nav-icon" onclick="showTab('objetivos')" title="Objetivos">◎</button>
+    <button class="nav-icon" onclick="showTab('noticias')" title="Noticias">☰</button>
+    <button class="nav-icon" onclick="showTab('conexiones')" title="Conexiones" style="margin-top:auto">⚙</button>
+  </nav>
+
+  <main>
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="page-title" id="page-title">Resumen</span>
+        <span class="live-badge"><span class="live-dot"></span>LIVE</span>
+      </div>
+      <div class="topbar-right">
+        <div class="dolar-chip"><span>USD/ARS · Blue </span><strong id="dolar-blue">$1,095</strong></div>
+        <div class="dolar-chip"><span>USD/ARS · MEP </span><strong id="dolar-mep">$1,088</strong></div>
+        <div class="last-update" id="update-time">—</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ PANEL: RESUMEN ═══════════════ -->
+    <div class="panel active" id="panel-resumen">
+      <div class="kpi-row">
+        <div class="kpi green">
+          <div class="kpi-label">Portfolio Total</div>
+          <div class="kpi-value">$42,850</div>
+          <div class="kpi-sub">USD · valorizado hoy</div>
+          <div class="kpi-delta pos">▲ +$1,240 este mes</div>
+        </div>
+        <div class="kpi green">
+          <div class="kpi-label">En ARS (equiv.)</div>
+          <div class="kpi-value">$46.9M</div>
+          <div class="kpi-sub">a dólar blue</div>
+          <div class="kpi-delta pos">▲ +8.2% MTD</div>
+        </div>
+        <div class="kpi blue">
+          <div class="kpi-label">Rentabilidad YTD</div>
+          <div class="kpi-value">+18.4%</div>
+          <div class="kpi-sub">vs objetivo 20%</div>
+          <div class="kpi-delta" style="color:var(--accent2)">91.8% del objetivo anual</div>
+        </div>
+        <div class="kpi gold">
+          <div class="kpi-label">Ahorro mensual</div>
+          <div class="kpi-value">$1,200</div>
+          <div class="kpi-sub">USD promedio 6m</div>
+          <div class="kpi-delta" style="color:var(--gold)">▲ +$200 vs mes ant.</div>
+        </div>
+        <div class="kpi red">
+          <div class="kpi-label">Drawdown máx.</div>
+          <div class="kpi-value">-6.2%</div>
+          <div class="kpi-sub">Máximo este año</div>
+          <div class="kpi-delta neg">Mar 2025 · -$2,657</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Distribución -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Distribución por activo</span>
+            <span class="card-badge badge-blue">por USD</span>
+          </div>
+          <div class="donut-wrap">
+            <svg class="donut-svg" viewBox="0 0 100 100">
+              <!-- ETFs: 38% → 135.6deg -->
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#1e2a3a" stroke-width="14"/>
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#3d8fff" stroke-width="14"
+                stroke-dasharray="90.5 148.7" stroke-dashoffset="38" stroke-linecap="butt"/>
+              <!-- Acciones AR: 22% → 79.2deg -->
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#00c896" stroke-width="14"
+                stroke-dasharray="52.4 186.8" stroke-dashoffset="-52.5" stroke-linecap="butt"/>
+              <!-- Crypto: 25% → 90deg -->
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#f0b429" stroke-width="14"
+                stroke-dasharray="59.7 179.5" stroke-dashoffset="-104.9" stroke-linecap="butt"/>
+              <!-- PF/Cash: 15% → 54deg -->
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#ff6b4a" stroke-width="14"
+                stroke-dasharray="35.8 203.4" stroke-dashoffset="-164.6" stroke-linecap="butt"/>
+              <text x="50" y="47" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#c8d6e8">TOTAL</text>
+              <text x="50" y="57" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#6b7f96">$42,850</text>
+            </svg>
+            <div class="donut-legend">
+              <div class="legend-item"><span class="legend-dot" style="background:#3d8fff"></span><span>ETFs USA</span><span class="legend-pct">38%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#00c896"></span><span>Acciones AR</span><span class="legend-pct">22%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#f0b429"></span><span>Crypto</span><span class="legend-pct">25%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#ff6b4a"></span><span>PF / Cash</span><span class="legend-pct">15%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Distribución por broker -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Distribución por broker</span>
+            <span class="card-badge badge-green">4 brokers</span>
+          </div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr>
+                <th>Broker</th><th>Activos</th><th>USD</th><th>%</th>
+              </tr></thead>
+              <tbody>
+                <tr>
+                  <td><span class="ticker">IOL</span></td>
+                  <td><span style="color:var(--text-dim)">Acciones · CEDEARs</span></td>
+                  <td class="pos">$16,200</td>
+                  <td><span class="badge-green card-badge">37.8%</span></td>
+                </tr>
+                <tr>
+                  <td><span class="ticker">Nexo</span></td>
+                  <td><span style="color:var(--text-dim)">BTC · ETH · USDC</span></td>
+                  <td class="pos">$10,730</td>
+                  <td><span class="badge-gold card-badge">25.0%</span></td>
+                </tr>
+                <tr>
+                  <td><span class="ticker">Ualá</span></td>
+                  <td><span style="color:var(--text-dim)">ETFs · PF USD</span></td>
+                  <td class="pos">$9,850</td>
+                  <td><span class="badge-blue card-badge">23.0%</span></td>
+                </tr>
+                <tr>
+                  <td><span class="ticker">Manual</span></td>
+                  <td><span style="color:var(--text-dim)">PF ARS · Cash</span></td>
+                  <td>$6,070</td>
+                  <td><span class="badge-red card-badge">14.2%</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evolución -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-header">
+          <span class="card-title">Evolución del portfolio</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-primary" onclick="setRange(this,'1M')">1M</button>
+            <button class="btn" onclick="setRange(this,'3M')">3M</button>
+            <button class="btn" onclick="setRange(this,'6M')">6M</button>
+            <button class="btn" onclick="setRange(this,'1A')">1A</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding-bottom:6px">
+          <div class="chart-area">
+            <svg class="chart-svg" viewBox="0 0 800 160" preserveAspectRatio="none" id="evolution-chart">
+              <defs>
+                <linearGradient id="areafill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#00c896" stop-opacity="0.25"/>
+                  <stop offset="100%" stop-color="#00c896" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path id="area-path" fill="url(#areafill)"/>
+              <path id="line-path" fill="none" stroke="#00c896" stroke-width="2"/>
+              <!-- Grid lines -->
+              <line x1="0" y1="40" x2="800" y2="40" stroke="#1e2a3a" stroke-width="1"/>
+              <line x1="0" y1="80" x2="800" y2="80" stroke="#1e2a3a" stroke-width="1"/>
+              <line x1="0" y1="120" x2="800" y2="120" stroke="#1e2a3a" stroke-width="1"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /panel-resumen -->
+
+    <!-- ═══════════════ PANEL: PORTFOLIO ═══════════════ -->
+    <div class="panel" id="panel-portfolio">
+      <div class="grid-3">
+        <!-- ETFs -->
+        <div class="card span-2">
+          <div class="card-header">
+            <span class="card-title">ETFs USA</span>
+            <span class="card-badge badge-blue">$16,283 · 38%</span>
+          </div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr>
+                <th>Ticker</th><th>Broker</th><th>Cant.</th><th>P. Compra</th><th>P. Actual</th><th>Valor</th><th>P&L</th>
+              </tr></thead>
+              <tbody>
+                <tr>
+                  <td><span class="ticker">SPY</span></td>
+                  <td><span class="broker-tag">Ualá</span></td>
+                  <td>12.5</td><td>$512.40</td><td>$538.70</td>
+                  <td>$6,734</td>
+                  <td class="pos">+5.1%</td>
+                </tr>
+                <tr>
+                  <td><span class="ticker">QQQ</span></td>
+                  <td><span class="broker-tag">Ualá</span></td>
+                  <td>8.0</td><td>$460.20</td><td>$478.90</td>
+                  <td>$3,831</td>
+                  <td class="pos">+4.1%</td>
+                </tr>
+                <tr>
+                  <td><span class="ticker">VWO</span></td>
+                  <td><span class="broker-tag">IOL</span></td>
+                  <td>45.0</td><td>$41.80</td><td>$43.20</td>
+                  <td>$1,944</td>
+                  <td class="pos">+3.3%</td>
+                </tr>
+                <tr>
+                  <td><span class="ticker">GLD</span></td>
+                  <td><span class="broker-tag">IOL</span></td>
+                  <td>15.0</td><td>$224.50</td><td>$252.10</td>
+                  <td>$3,782</td>
+                  <td class="pos">+12.3%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Stat mini -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">ETFs · Stats</span></div>
+          <div class="card-body">
+            <div class="stat-grid">
+              <div class="stat-mini">
+                <div class="stat-mini-label">P&L total</div>
+                <div class="stat-mini-value pos">+$1,420</div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-mini-label">Mejor pos.</div>
+                <div class="stat-mini-value" style="color:var(--gold)">GLD +12%</div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-mini-label">% portfolio</div>
+                <div class="stat-mini-value">38%</div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-mini-label">Div. recib.</div>
+                <div class="stat-mini-value">$142</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <!-- Acciones AR / CEDEARs -->
+        <div class="card span-2">
+          <div class="card-header">
+            <span class="card-title">Acciones ARG · CEDEARs</span>
+            <span class="card-badge badge-green">$9,427 · 22%</span>
+          </div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr>
+                <th>Ticker</th><th>Broker</th><th>Cant.</th><th>P. Compra</th><th>P. Actual</th><th>Valor</th><th>P&L</th>
+              </tr></thead>
+              <tbody>
+                <tr>
+                  <td><span class="ticker">GGAL</span></td>
+                  <td><span class="broker-tag">IOL</span></td>
+                  <td>2,400</td><td>$4,820</td><td>$5,340</td>
+                  <td>$3,048</td>
+                  <td class="pos">+10.8%</td>
+                </tr>
+                <tr>
+                  <td><span class="ticker">YPF</span></td>
+                  <td><span class="broker-tag">IOL</span></td>
+                  <td>180</td><td>$37,200</td><td>$39,800</td>
+                  <td>$2,074</td>
+                  <td class="pos">+7.0%</td>
+                </tr>
+                <tr>
+                  <td><span class="ticker">MSFT C</span></td>
+                  <td><span class="broker-tag">IOL</span></td>
+                  <td>90</td><td>$5,840</td><td>$5,680</td>
+                  <td>$1,480</td>
+                  <td class="neg">-2.7%</td>
+                </tr>
+                <tr>
+                  <td><span class="ticker">BBAR</span></td>
+                  <td><span class="broker-tag">IOL</span></td>
+                  <td>1,100</td><td>$2,650</td><td>$2,935</td>
+                  <td>$937</td>
+                  <td class="pos">+10.8%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">ARG · Stats</span></div>
+          <div class="card-body">
+            <div class="stat-grid">
+              <div class="stat-mini">
+                <div class="stat-mini-label">P&L total</div>
+                <div class="stat-mini-value pos">+$890</div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-mini-label">Mejor pos.</div>
+                <div class="stat-mini-value" style="color:var(--accent)">GGAL +10.8%</div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-mini-label">En rojo</div>
+                <div class="stat-mini-value neg">1 pos.</div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-mini-label">Exposición</div>
+                <div class="stat-mini-value">22%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Crypto -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Crypto · Nexo</span>
+            <span class="card-badge badge-gold">$10,730 · 25%</span>
+          </div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr><th>Asset</th><th>Cantidad</th><th>Precio</th><th>Valor</th><th>P&L</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><span class="ticker">BTC</span></td>
+                  <td>0.082</td><td>$104,200</td>
+                  <td>$8,544</td><td class="pos">+28.4%</td>
+                </tr>
+                <tr>
+                  <td><span class="ticker">ETH</span></td>
+                  <td>0.54</td><td>$2,480</td>
+                  <td>$1,339</td><td class="pos">+14.1%</td>
+                </tr>
+                <tr>
+                  <td><span class="ticker">USDC</span></td>
+                  <td>847</td><td>$1.00</td>
+                  <td>$847</td><td style="color:var(--text-dim)">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Plazo fijo / Cash -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">PF · Ahorro · Cash</span>
+            <span class="card-badge badge-red">$6,410 · 15%</span>
+          </div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr><th>Instrumento</th><th>Monto</th><th>TNA</th><th>Vence</th><th>Rend.</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><span class="ticker">PF USD</span></td>
+                  <td>$3,200</td><td style="color:var(--gold)">5.8%</td>
+                  <td style="color:var(--text-dim)">15 jul</td>
+                  <td class="pos">+$186</td>
+                </tr>
+                <tr>
+                  <td><span class="ticker">PF ARS</span></td>
+                  <td>$1.8M</td><td style="color:var(--gold)">38%</td>
+                  <td style="color:var(--text-dim)">30 jun</td>
+                  <td class="pos">+$684K</td>
+                </tr>
+                <tr>
+                  <td><span class="ticker">Cash USD</span></td>
+                  <td>$1,010</td><td style="color:var(--text-dim)">—</td>
+                  <td style="color:var(--text-dim)">—</td>
+                  <td style="color:var(--text-dim)">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div><!-- /panel-portfolio -->
+
+    <!-- ═══════════════ PANEL: MERCADO ═══════════════ -->
+    <div class="panel" id="panel-mercado">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Mis activos · cotización</span>
+            <span class="card-badge badge-green">en tiempo real*</span>
+          </div>
+          <div class="card-body" id="watchlist-body">
+            <div class="spark-row">
+              <span class="spark-ticker">SPY</span>
+              <span class="spark-price" id="price-SPY">$538.70</span>
+              <svg class="sparkline" viewBox="0 0 100 30" id="spark-SPY"></svg>
+              <span class="spark-change pos" id="chg-SPY">+0.94%</span>
+            </div>
+            <div class="spark-row">
+              <span class="spark-ticker">QQQ</span>
+              <span class="spark-price" id="price-QQQ">$478.90</span>
+              <svg class="sparkline" viewBox="0 0 100 30" id="spark-QQQ"></svg>
+              <span class="spark-change pos" id="chg-QQQ">+1.12%</span>
+            </div>
+            <div class="spark-row">
+              <span class="spark-ticker">GLD</span>
+              <span class="spark-price" id="price-GLD">$252.10</span>
+              <svg class="sparkline" viewBox="0 0 100 30" id="spark-GLD"></svg>
+              <span class="spark-change pos" id="chg-GLD">+0.44%</span>
+            </div>
+            <div class="spark-row">
+              <span class="spark-ticker">BTC</span>
+              <span class="spark-price" id="price-BTC">$104,200</span>
+              <svg class="sparkline" viewBox="0 0 100 30" id="spark-BTC"></svg>
+              <span class="spark-change pos" id="chg-BTC">+2.31%</span>
+            </div>
+            <div class="spark-row">
+              <span class="spark-ticker">ETH</span>
+              <span class="spark-price" id="price-ETH">$2,480</span>
+              <svg class="sparkline" viewBox="0 0 100 30" id="spark-ETH"></svg>
+              <span class="spark-change neg" id="chg-ETH">-0.82%</span>
+            </div>
+            <div class="spark-row">
+              <span class="spark-ticker">GGAL</span>
+              <span class="spark-price" id="price-GGAL">$5,340</span>
+              <svg class="sparkline" viewBox="0 0 100 30" id="spark-GGAL"></svg>
+              <span class="spark-change pos" id="chg-GGAL">+3.1%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Índices globales</span>
+          </div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr><th>Índice</th><th>Valor</th><th>Día</th><th>YTD</th></tr></thead>
+              <tbody>
+                <tr><td><span class="ticker">S&P 500</span></td><td>5,864</td><td class="pos">+0.92%</td><td class="pos">+14.2%</td></tr>
+                <tr><td><span class="ticker">Nasdaq</span></td><td>19,124</td><td class="pos">+1.20%</td><td class="pos">+18.7%</td></tr>
+                <tr><td><span class="ticker">Merval</span></td><td>2,841,000</td><td class="pos">+3.40%</td><td class="pos">+62.1%</td></tr>
+                <tr><td><span class="ticker">Oro</span></td><td>$3,342</td><td class="pos">+0.52%</td><td class="pos">+26.4%</td></tr>
+                <tr><td><span class="ticker">BTC/USD</span></td><td>$104,200</td><td class="pos">+2.31%</td><td class="pos">+48.2%</td></tr>
+                <tr><td><span class="ticker">Inflac. AR</span></td><td>—</td><td style="color:var(--warn)">2.9%/m</td><td class="neg">+38.4%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Dólar · tipos de cambio</span>
+          <span class="card-badge badge-gold">hoy</span>
+        </div>
+        <div class="card-body">
+          <div class="kpi-row" style="margin-bottom:0">
+            <div class="kpi gold" style="padding:10px 14px">
+              <div class="kpi-label">Blue</div>
+              <div class="kpi-value" style="font-size:18px">$1,095</div>
+              <div class="kpi-delta pos">+$5 hoy</div>
+            </div>
+            <div class="kpi blue" style="padding:10px 14px">
+              <div class="kpi-label">MEP / Bolsa</div>
+              <div class="kpi-value" style="font-size:18px">$1,088</div>
+              <div class="kpi-delta pos">+$3 hoy</div>
+            </div>
+            <div class="kpi green" style="padding:10px 14px">
+              <div class="kpi-label">CCL</div>
+              <div class="kpi-value" style="font-size:18px">$1,092</div>
+              <div class="kpi-delta pos">+$4 hoy</div>
+            </div>
+            <div class="kpi" style="padding:10px 14px">
+              <div class="kpi-label">Oficial</div>
+              <div class="kpi-value" style="font-size:18px">$1,024</div>
+              <div class="kpi-delta" style="color:var(--text-dim)">+$0.8 hoy</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /panel-mercado -->
+
+    <!-- ═══════════════ PANEL: PROYECCIONES ═══════════════ -->
+    <div class="panel" id="panel-proyecciones">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Proyección a 12 meses</span>
+            <span class="card-badge badge-blue">$1,200/mes ahorro</span>
+          </div>
+          <div class="card-body">
+            <div class="proj-scenario" style="border-color:rgba(0,200,150,.3)">
+              <div class="proj-label">🐂 Escenario optimista · +20% anual</div>
+              <div class="proj-value pos">$65,820</div>
+              <div class="proj-sub">Aporte mensual compuesto · ganancia $22,970</div>
+            </div>
+            <div class="proj-scenario" style="border-color:rgba(61,143,255,.3)">
+              <div class="proj-label">🐻 Escenario base · +12% anual</div>
+              <div class="proj-value" style="color:var(--accent2)">$58,240</div>
+              <div class="proj-sub">Histórico promedio portf. · ganancia $15,390</div>
+            </div>
+            <div class="proj-scenario" style="border-color:rgba(255,107,74,.3)">
+              <div class="proj-label">🦆 Escenario pesimista · +2% anual</div>
+              <div class="proj-value" style="color:var(--warn)">$58,240</div>
+              <div class="proj-sub">Mercado lateral · ganancia $1,040</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Interés compuesto · simulador</span>
+          </div>
+          <div class="card-body">
+            <div style="margin-bottom:12px">
+              <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-bottom:4px">Capital inicial (USD)</div>
+              <input type="range" min="10000" max="100000" step="500" value="42850" id="slider-capital" oninput="calcProj()" style="width:100%;accent-color:var(--accent)">
+              <div style="font-family:var(--mono);font-size:12px;color:var(--accent)" id="val-capital">$42,850</div>
+            </div>
+            <div style="margin-bottom:12px">
+              <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-bottom:4px">Aporte mensual (USD)</div>
+              <input type="range" min="0" max="5000" step="100" value="1200" id="slider-aporte" oninput="calcProj()" style="width:100%;accent-color:var(--accent2)">
+              <div style="font-family:var(--mono);font-size:12px;color:var(--accent2)" id="val-aporte">$1,200</div>
+            </div>
+            <div style="margin-bottom:12px">
+              <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-bottom:4px">Rendimiento anual (%)</div>
+              <input type="range" min="2" max="30" step="1" value="15" id="slider-rend" oninput="calcProj()" style="width:100%;accent-color:var(--gold)">
+              <div style="font-family:var(--mono);font-size:12px;color:var(--gold)" id="val-rend">15%</div>
+            </div>
+            <div style="margin-bottom:12px">
+              <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-bottom:4px">Horizonte (años)</div>
+              <input type="range" min="1" max="30" step="1" value="5" id="slider-años" oninput="calcProj()" style="width:100%;accent-color:var(--warn)">
+              <div style="font-family:var(--mono);font-size:12px;color:var(--warn)" id="val-años">5 años</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:12px;text-align:center">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Resultado proyectado</div>
+              <div style="font-family:var(--mono);font-size:24px;font-weight:600;color:var(--accent)" id="result-proj">$108,240</div>
+              <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:3px" id="result-ganancia">Ganancia: +$65,390 · +152%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /panel-proyecciones -->
+
+    <!-- ═══════════════ PANEL: OBJETIVOS ═══════════════ -->
+    <div class="panel" id="panel-objetivos">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Objetivos 2025</span>
+            <span class="card-badge badge-green">3 de 5 en curso</span>
+          </div>
+          <div class="card-body">
+            <div class="goal-item">
+              <div class="goal-header">
+                <span class="goal-name">🎯 Portfolio $50K USD</span>
+                <span class="goal-pct">85.7%</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:85.7%;background:var(--accent)"></div></div>
+              <div class="goal-sub"><span>$42,850 de $50,000</span><span>dic 2025</span></div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-header">
+                <span class="goal-name">📈 Rentabilidad +20% YTD</span>
+                <span class="goal-pct">91.8%</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:91.8%;background:var(--accent2)"></div></div>
+              <div class="goal-sub"><span>+18.4% actual</span><span>falta +1.6%</span></div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-header">
+                <span class="goal-name">💰 Ahorro mensual $1,500</span>
+                <span class="goal-pct">80%</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:80%;background:var(--gold)"></div></div>
+              <div class="goal-sub"><span>$1,200/mes actual</span><span>falta $300/mes</span></div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-header">
+                <span class="goal-name">🪙 10% en cripto máx.</span>
+                <span class="goal-pct">250% ⚠️</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--warn)"></div></div>
+              <div class="goal-sub"><span style="color:var(--warn)">25% actual · sobre límite</span><span>revisar</span></div>
+            </div>
+            <div class="goal-item">
+              <div class="goal-header">
+                <span class="goal-name">🛡️ Fondo emergencia 6 meses</span>
+                <span class="goal-pct">60%</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:60%;background:var(--muted)"></div></div>
+              <div class="goal-sub"><span>$3.6 de $6K reserva líquida</span><span>dic 2025</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">Alertas activas</span><span class="card-badge badge-red">2 alertas</span></div>
+          <div class="card-body">
+            <div style="padding:10px 0;border-bottom:1px solid rgba(30,42,58,.6)">
+              <div style="font-family:var(--mono);font-size:10px;color:var(--warn);margin-bottom:3px">⚠️ EXCESO CRIPTO</div>
+              <div style="font-size:12px">Tu posición en crypto (25%) supera tu límite objetivo de 10%. Considerá rebalancear.</div>
+            </div>
+            <div style="padding:10px 0;border-bottom:1px solid rgba(30,42,58,.6)">
+              <div style="font-family:var(--mono);font-size:10px;color:var(--gold);margin-bottom:3px">📅 PF ARS VENCE EN 3 DÍAS</div>
+              <div style="font-size:12px">Tu Plazo Fijo ARS de $1.8M vence el 30 jun. Decidí si renovar o rotar.</div>
+            </div>
+            <div style="padding:10px 0">
+              <div style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-bottom:3px">✅ OBJETIVO CERCA</div>
+              <div style="font-size:12px">A $7,150 de tu meta de $50K. Con el ahorro actual lo lograría en ~6 meses.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /panel-objetivos -->
+
+    <!-- ═══════════════ PANEL: NOTICIAS ═══════════════ -->
+    <div class="panel" id="panel-noticias">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Noticias relevantes</span>
+            <span class="card-badge badge-blue">últimas 24hs</span>
+          </div>
+          <div class="card-body">
+            <div class="news-item">
+              <span class="news-tag badge-blue">SPY</span>
+              <div>
+                <div class="news-title">Fed mantiene tasas sin cambios; Powell anticipa dos bajas para el segundo semestre</div>
+                <div class="news-meta">Reuters · hace 2h</div>
+              </div>
+            </div>
+            <div class="news-item">
+              <span class="news-tag badge-gold">BTC</span>
+              <div>
+                <div class="news-title">Bitcoin supera $104K: flujos institucionales récord en ETFs de spot en EE.UU.</div>
+                <div class="news-meta">CoinDesk · hace 4h</div>
+              </div>
+            </div>
+            <div class="news-item">
+              <span class="news-tag badge-green">GGAL</span>
+              <div>
+                <div class="news-title">Galicia anuncia dividendo extraordinario; sube 3.1% en la rueda</div>
+                <div class="news-meta">Infobae · hace 5h</div>
+              </div>
+            </div>
+            <div class="news-item">
+              <span class="news-tag badge-gold">GLD</span>
+              <div>
+                <div class="news-title">Oro cerca de máximos históricos ante tensiones geopolíticas en Medio Oriente</div>
+                <div class="news-meta">Bloomberg · hace 6h</div>
+              </div>
+            </div>
+            <div class="news-item">
+              <span class="news-tag badge-red">ARG</span>
+              <div>
+                <div class="news-title">Inflación de mayo en 2.9%: menor registro en 3 años, debajo de expectativas</div>
+                <div class="news-meta">Ámbito · hace 8h</div>
+              </div>
+            </div>
+            <div class="news-item">
+              <span class="news-tag badge-blue">QQQ</span>
+              <div>
+                <div class="news-title">Nvidia sube 4% tras reporte de demanda récord de chips H200 para centros de datos</div>
+                <div class="news-meta">CNBC · hace 10h</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">Calendario económico</span><span class="card-badge badge-gold">próximos eventos</span></div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr><th>Fecha</th><th>Evento</th><th>Impacto</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td style="color:var(--text-dim)">30 jun</td>
+                  <td>PF ARS vence · renovar</td>
+                  <td><span class="card-badge badge-red">ALTO</span></td>
+                </tr>
+                <tr>
+                  <td style="color:var(--text-dim)">2 jul</td>
+                  <td>Nóminas EE.UU. (NFP)</td>
+                  <td><span class="card-badge badge-gold">MEDIO</span></td>
+                </tr>
+                <tr>
+                  <td style="color:var(--text-dim)">10 jul</td>
+                  <td>IPC EE.UU. (CPI)</td>
+                  <td><span class="card-badge badge-red">ALTO</span></td>
+                </tr>
+                <tr>
+                  <td style="color:var(--text-dim)">15 jul</td>
+                  <td>PF USD vence · renovar</td>
+                  <td><span class="card-badge badge-gold">MEDIO</span></td>
+                </tr>
+                <tr>
+                  <td style="color:var(--text-dim)">30 jul</td>
+                  <td>Reunión FOMC — Fed</td>
+                  <td><span class="card-badge badge-red">ALTO</span></td>
+                </tr>
+                <tr>
+                  <td style="color:var(--text-dim)">ago</td>
+                  <td>Resultados trimestrales EE.UU.</td>
+                  <td><span class="card-badge badge-blue">BAJO</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div><!-- /panel-noticias -->
+
+    <!-- ═══════════════ PANEL: CONEXIONES ═══════════════ -->
+    <div class="panel" id="panel-conexiones">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Estado de conexiones</span>
+          </div>
+          <div class="card-body">
+            <div class="broker-card">
+              <div class="broker-info">
+                <div class="broker-icon" style="background:rgba(61,143,255,.15)">🏦</div>
+                <div>
+                  <div class="broker-name">Invertir Online (IOL)</div>
+                  <div class="broker-detail">API REST disponible · última sync: hace 3 min</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="status-dot status-connected"></span>
+                <button class="btn btn-primary">Conectado</button>
+              </div>
+            </div>
+            <div class="broker-card">
+              <div class="broker-info">
+                <div class="broker-icon" style="background:rgba(0,200,150,.15)">🔷</div>
+                <div>
+                  <div class="broker-name">Nexo</div>
+                  <div class="broker-detail">API Key configurada · sync automático</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="status-dot status-connected"></span>
+                <button class="btn btn-primary">Conectado</button>
+              </div>
+            </div>
+            <div class="broker-card">
+              <div class="broker-info">
+                <div class="broker-icon" style="background:rgba(240,180,41,.15)">💳</div>
+                <div>
+                  <div class="broker-name">Ualá</div>
+                  <div class="broker-detail">Sin API pública · entrada manual o scraping</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="status-dot status-manual"></span>
+                <button class="btn">Manual</button>
+              </div>
+            </div>
+            <div class="broker-card" style="border-style:dashed;opacity:.6">
+              <div class="broker-info">
+                <div class="broker-icon" style="background:rgba(100,100,100,.1)">＋</div>
+                <div>
+                  <div class="broker-name">Agregar broker</div>
+                  <div class="broker-detail">Cocos, Bull Market, Balanz, Binance...</div>
+                </div>
+              </div>
+              <button class="btn">Configurar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">Fuentes de datos</span></div>
+          <div class="card-body">
+            <div class="broker-card">
+              <div class="broker-info">
+                <div class="broker-icon" style="background:rgba(0,200,150,.1)">📊</div>
+                <div>
+                  <div class="broker-name">Yahoo Finance</div>
+                  <div class="broker-detail">ETFs · Acciones USA · gratis</div>
+                </div>
+              </div>
+              <span class="status-dot status-connected"></span>
+            </div>
+            <div class="broker-card">
+              <div class="broker-info">
+                <div class="broker-icon" style="background:rgba(240,180,41,.1)">🪙</div>
+                <div>
+                  <div class="broker-name">CoinGecko API</div>
+                  <div class="broker-detail">Crypto prices · gratis hasta 30 calls/min</div>
+                </div>
+              </div>
+              <span class="status-dot status-connected"></span>
+            </div>
+            <div class="broker-card">
+              <div class="broker-info">
+                <div class="broker-icon" style="background:rgba(61,143,255,.1)">💱</div>
+                <div>
+                  <div class="broker-name">DolarApi.ar</div>
+                  <div class="broker-detail">Blue · MEP · CCL · Oficial</div>
+                </div>
+              </div>
+              <span class="status-dot status-connected"></span>
+            </div>
+            <div class="broker-card">
+              <div class="broker-info">
+                <div class="broker-icon" style="background:rgba(100,100,100,.1)">📰</div>
+                <div>
+                  <div class="broker-name">NewsAPI</div>
+                  <div class="broker-detail">Noticias por ticker · requiere API key</div>
+                </div>
+              </div>
+              <span class="status-dot status-pending"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">Próximos pasos para automatización</span></div>
+        <div class="card-body">
+          <table class="data-table">
+            <thead><tr><th>#</th><th>Tarea</th><th>Dificultad</th><th>Impacto</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td style="color:var(--text-dim)">1</td><td>Conectar IOL API (OAuth2 + endpoints)</td><td><span class="card-badge badge-blue">Media</span></td><td><span class="card-badge badge-red">Alto</span></td><td class="pos">✓ Listo</td></tr>
+              <tr><td style="color:var(--text-dim)">2</td><td>Conectar Nexo API (API Key)</td><td><span class="card-badge badge-green">Fácil</span></td><td><span class="card-badge badge-red">Alto</span></td><td class="pos">✓ Listo</td></tr>
+              <tr><td style="color:var(--text-dim)">3</td><td>Backend Node/Python para proxy seguro</td><td><span class="card-badge badge-red">Alta</span></td><td><span class="card-badge badge-red">Alto</span></td><td style="color:var(--gold)">⏳ Pendiente</td></tr>
+              <tr><td style="color:var(--text-dim)">4</td><td>Sync automático cada 15 min (cron)</td><td><span class="card-badge badge-blue">Media</span></td><td><span class="card-badge badge-gold">Medio</span></td><td style="color:var(--gold)">⏳ Pendiente</td></tr>
+              <tr><td style="color:var(--text-dim)">5</td><td>Ualá: entrada manual o scraping</td><td><span class="card-badge badge-red">Alta</span></td><td><span class="card-badge badge-gold">Medio</span></td><td style="color:var(--text-dim)">Explorar</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /panel-conexiones -->
+
+  </main>
+</div>
+
+<script>
+// ── TAB NAVIGATION ──
+const titles = {
+  resumen:'Resumen · Portfolio', portfolio:'Portfolio · Posiciones',
+  mercado:'Mercado · Cotizaciones', proyecciones:'Proyecciones',
+  objetivos:'Objetivos 2025', noticias:'Noticias · Calendario',
+  conexiones:'Conexiones · APIs'
+};
+
+function showTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-icon').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.getElementById('page-title').textContent = titles[id];
+  event.currentTarget.classList.add('active');
+}
+
+// ── CLOCK ──
+function updateTime() {
+  const now = new Date();
+  document.getElementById('update-time').textContent =
+    'actualizado ' + now.toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateTime, 1000); updateTime();
+
+// ── EVOLUTION CHART ──
+const portfolioData = {
+  '1M': [38200,38900,39100,38700,39800,40200,40800,41200,40900,41800,42100,42500,42850],
+  '3M': [36000,36800,37200,36900,38000,38800,39200,39800,40100,40800,41200,42100,42850],
+  '6M': [32000,33500,34200,35100,35800,36200,37000,38100,39200,40100,41200,42100,42850],
+  '1A': [25000,27000,28500,30000,29000,31000,33000,35000,36500,38000,40000,41500,42850]
+};
+
+function drawEvolution(data) {
+  const svg = document.getElementById('evolution-chart');
+  const W = 800, H = 160, pad = 10;
+  const min = Math.min(...data) * 0.98;
+  const max = Math.max(...data) * 1.01;
+  const pts = data.map((v, i) => {
+    const x = pad + (i / (data.length - 1)) * (W - 2*pad);
+    const y = H - pad - ((v - min) / (max - min)) * (H - 2*pad);
+    return [x, y];
+  });
+  const d = pts.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(' ');
+  const area = d + ` L${pts[pts.length-1][0]},${H} L${pts[0][0]},${H} Z`;
+  document.getElementById('line-path').setAttribute('d', d);
+  document.getElementById('area-path').setAttribute('d', area);
+}
+drawEvolution(portfolioData['1M']);
+
+function setRange(btn, range) {
+  document.querySelectorAll('[onclick^="setRange"]').forEach(b => b.className = 'btn');
+  btn.className = 'btn btn-primary';
+  drawEvolution(portfolioData[range]);
+}
+
+// ── SPARKLINES ──
+const sparkData = {
+  SPY:  [532,535,533,537,534,536,538,539,538.7],
+  QQQ:  [470,474,472,476,475,477,479,478,478.9],
+  GLD:  [248,249,251,250,252,251,253,252,252.1],
+  BTC:  [99000,101000,102000,100500,103000,104500,103800,105000,104200],
+  ETH:  [2520,2510,2490,2480,2500,2470,2460,2490,2480],
+  GGAL: [5100,5150,5200,5180,5220,5280,5310,5320,5340]
+};
+
+function drawSparkline(id, data, color) {
+  const svg = document.getElementById('spark-' + id);
+  if (!svg) return;
+  const W = 100, H = 30;
+  const min = Math.min(...data); const max = Math.max(...data);
+  const pts = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * W;
+    const y = H - 2 - ((v - min) / (max - min || 1)) * (H - 4);
+    return `${x},${y}`;
+  });
+  svg.innerHTML = `<polyline points="${pts.join(' ')}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>`;
+}
+
+const colors = {SPY:'#3d8fff',QQQ:'#3d8fff',GLD:'#f0b429',BTC:'#f0b429',ETH:'#f0b429',GGAL:'#00c896'};
+Object.keys(sparkData).forEach(k => drawSparkline(k, sparkData[k], colors[k]));
+
+// ── PROJECTOR ──
+function calcProj() {
+  const capital = +document.getElementById('slider-capital').value;
+  const aporte  = +document.getElementById('slider-aporte').value;
+  const rend    = +document.getElementById('slider-rend').value / 100;
+  const años    = +document.getElementById('slider-años').value;
+  document.getElementById('val-capital').textContent = '$' + capital.toLocaleString('es-AR');
+  document.getElementById('val-aporte').textContent  = '$' + aporte.toLocaleString('es-AR');
+  document.getElementById('val-rend').textContent    = rend * 100 + '%';
+  document.getElementById('val-años').textContent    = años + (años === 1 ? ' año' : ' años');
+  const r = rend / 12;
+  const n = años * 12;
+  const futureCapital = capital * Math.pow(1 + r, n);
+  const futureAportes = aporte * (Math.pow(1 + r, n) - 1) / r;
+  const total = futureCapital + futureAportes;
+  const ganancia = total - capital - aporte * n;
+  const pct = ((total - capital) / capital * 100).toFixed(0);
+  document.getElementById('result-proj').textContent = '$' + Math.round(total).toLocaleString('es-AR');
+  document.getElementById('result-ganancia').textContent =
+    `Ganancia: +$${Math.round(ganancia).toLocaleString('es-AR')} · +${pct}%`;
+}
+calcProj();
+
+// ── SIMULATED PRICE FLICKER ──
+function flicker() {
+  const tickers = ['SPY','QQQ','BTC','ETH'];
+  tickers.forEach(t => {
+    const el = document.getElementById('price-' + t);
+    if (!el) return;
+    const cur = parseFloat(el.textContent.replace(/[$,]/g, ''));
+    const delta = cur * (Math.random() - 0.495) * 0.002;
+    const newVal = cur + delta;
+    const fmt = t === 'BTC' ? Math.round(newVal).toLocaleString('en-US') :
+                newVal > 1000 ? Math.round(newVal).toLocaleString('en-US') :
+                newVal.toFixed(2);
+    el.textContent = '$' + fmt;
+    el.style.color = delta > 0 ? 'var(--accent)' : 'var(--warn)';
+    setTimeout(() => el.style.color = '', 400);
+  });
+}
+setInterval(flicker, 3500);
+</script>
+</body>
+</html>
