@@ -284,27 +284,32 @@ async function fetchSheet(sheet) {
 //  DATOS DE RESPALDO (última actualización manual)
 // ════════════════════════════════════════
 const FALLBACK = {
+  // Datos actualizados: 28 Jun 2026
   mine:[
+    // IOL
     {ticker:"META",broker:"IOL",fecha_c:"Nov 27, 2025",valor_c:26.98,valor_hoy:22.77,var_pct:-15.62},
-    {ticker:"SPY",broker:"IOL",fecha_c:"Nov 27, 2025",valor_c:103.14,valor_hoy:108.58,var_pct:5.27},
+    {ticker:"SPY", broker:"IOL",fecha_c:"Nov 27, 2025",valor_c:103.14,valor_hoy:108.58,var_pct:5.27},
     {ticker:"AAPL",broker:"IOL",fecha_c:"Nov 27, 2025",valor_c:13.92,valor_hoy:14.09,var_pct:1.24},
     {ticker:"META",broker:"IOL",fecha_c:"Nov 27, 2025",valor_c:26.98,valor_hoy:22.77,var_pct:-15.62},
     {ticker:"AAPL",broker:"IOL",fecha_c:"Nov 27, 2025",valor_c:13.92,valor_hoy:14.09,var_pct:1.24},
     {ticker:"AAPL",broker:"IOL",fecha_c:"Nov 27, 2025",valor_c:13.92,valor_hoy:14.09,var_pct:1.24},
-    {ticker:"XLK",broker:"IOL",fecha_c:"Dec 23, 2025",valor_c:6.38,valor_hoy:7.82,var_pct:22.57},
-    {ticker:"QQQ",broker:"IOL",fecha_c:"Dec 23, 2025",valor_c:34.65,valor_hoy:35.08,var_pct:1.23},
+    {ticker:"XLK", broker:"IOL",fecha_c:"Dec 23, 2025",valor_c:6.38, valor_hoy:7.82, var_pct:22.57},
+    {ticker:"QQQ", broker:"IOL",fecha_c:"Dec 23, 2025",valor_c:34.65,valor_hoy:35.08,var_pct:1.23},
     {ticker:"META",broker:"IOL",fecha_c:"Dec 23, 2025",valor_c:27.98,valor_hoy:22.77,var_pct:-18.63},
-    {ticker:"SPY",broker:"IOL",fecha_c:"Jan 2, 2026",valor_c:171.48,valor_hoy:180.97,var_pct:5.54},
-    {ticker:"QQQ",broker:"Santander",fecha_c:"Dec 30, 2025",valor_c:62.13,valor_hoy:70.16,var_pct:12.92},
-    {ticker:"QQQ",broker:"Santander",fecha_c:"Jan 2, 2026",valor_c:184.90,valor_hoy:210.47,var_pct:13.83},
-    {ticker:"XLK",broker:"Santander",fecha_c:"Jan 2, 2026",valor_c:211.20,valor_hoy:261.94,var_pct:24.03},
-    {ticker:"META",broker:"Santander",fecha_c:"Jan 2, 2026",valor_c:108.86,valor_hoy:91.07,var_pct:-16.34},
+    {ticker:"SPY", broker:"IOL",fecha_c:"Jan 2, 2026", valor_c:171.48,valor_hoy:180.97,var_pct:5.54},
+    {ticker:"SPY", broker:"IOL",fecha_c:"Jan 2, 2026", valor_c:171.48,valor_hoy:180.97,var_pct:5.54},
+    // Santander (no-Ali)
+    {ticker:"QQQ", broker:"Santander",fecha_c:"Dec 30, 2025",valor_c:62.13, valor_hoy:70.16, var_pct:12.92},
+    {ticker:"QQQ", broker:"Santander",fecha_c:"Jan 2, 2026", valor_c:184.90,valor_hoy:210.47,var_pct:13.83},
+    {ticker:"QQQ", broker:"Santander",fecha_c:"Jan 2, 2026", valor_c:184.90,valor_hoy:210.47,var_pct:13.83},
+    {ticker:"XLK", broker:"Santander",fecha_c:"Jan 2, 2026", valor_c:211.20,valor_hoy:261.94,var_pct:24.03},
+    {ticker:"META",broker:"Santander",fecha_c:"Jan 2, 2026", valor_c:108.86,valor_hoy:91.07, var_pct:-16.34},
   ],
   ali:[
-    {ticker:"SPY",broker:"Santander",fecha_c:"Dec 30, 2025",valor_c:34.84,valor_hoy:36.19,var_pct:3.88},
-    {ticker:"SPY",broker:"Santander",fecha_c:"Jan 2, 2026",valor_c:102.84,valor_hoy:108.58,var_pct:5.59},
-    {ticker:"SPY",broker:"Santander",fecha_c:"Jan 26, 2026",valor_c:68.26,valor_hoy:72.39,var_pct:6.04},
-    {ticker:"SPY",broker:"Santander",fecha_c:"Mar 27, 2026",valor_c:60.56,valor_hoy:72.39,var_pct:19.53},
+    {ticker:"SPY",broker:"Santander",fecha_c:"Dec 30, 2025",valor_c:34.84, valor_hoy:36.19, var_pct:3.88},
+    {ticker:"SPY",broker:"Santander",fecha_c:"Jan 2, 2026", valor_c:102.84,valor_hoy:108.58,var_pct:5.59},
+    {ticker:"SPY",broker:"Santander",fecha_c:"Jan 26, 2026",valor_c:68.26, valor_hoy:72.39, var_pct:6.04},
+    {ticker:"SPY",broker:"Santander",fecha_c:"Mar 27, 2026",valor_c:60.56, valor_hoy:72.39, var_pct:19.53},
   ],
   cartera:[
     {ticker:"META",valor_c:190.80,valor_act:159.37,var_pct:-16.47,proporcion:11.66},
@@ -314,19 +319,18 @@ const FALLBACK = {
     {ticker:"QQQ", valor_c:281.68,valor_act:315.71,var_pct:12.08, proporcion:23.11},
   ],
   resto:[
-    {fecha:"1-oct-2025", cat:"FCI USD",broker:"Ualá",    activo:"USD", valor_c:1285.82,valor_a:1473.31,pl:187.49,pl_pct:14.58,pl_ok:true},
-    {fecha:"30-dic-2025",cat:"FCI USD",broker:"Santander",activo:"USD",valor_c:2068.27,valor_a:2072.36,pl:4.09,  pl_pct:0.20, pl_ok:true},
-    {fecha:"26-ene-2026",cat:"Bitcoin",broker:"Nexo",    activo:"BTC", valor_c:48.97,  valor_a:48.97,  pl:0,     pl_pct:null, pl_ok:false},
-    {fecha:"26-ene-2026",cat:"ETF",    broker:"Nexo",    activo:"SPY", valor_c:215.94, valor_a:215.94, pl:0,     pl_pct:null, pl_ok:false},
-    {fecha:"26-ene-2026",cat:"ETF",    broker:"Nexo",    activo:"XLV", valor_c:89.66,  valor_a:83.77,  pl:-5.89, pl_pct:-6.57,pl_ok:true},
-    {fecha:"26-ene-2026",cat:"ETF",    broker:"Nexo",    activo:"XLE", valor_c:150.42, valor_a:151.05, pl:0.63,  pl_pct:0.42, pl_ok:true},
-    {fecha:"26-ene-2026",cat:"ETF",    broker:"Nexo",    activo:"SPYG",valor_c:72.81,  valor_a:74.59,  pl:1.78,  pl_pct:2.44, pl_ok:true},
-    {fecha:"27-mar-2026",cat:"ETF",    broker:"Nexo",    activo:"MSFT",valor_c:89.00,  valor_a:100.24, pl:11.24, pl_pct:null, pl_ok:false},
-    {fecha:"27-mar-2026",cat:"ETF",    broker:"Nexo",    activo:"SPY", valor_c:160.00, valor_a:160.00, pl:0,     pl_pct:null, pl_ok:false},
-    {fecha:"27-mar-2026",cat:"USDT",   broker:"Nexo",    activo:"USDT",valor_c:437.43, valor_a:437.43, pl:0,     pl_pct:null, pl_ok:false},
-    {fecha:"27-mar-2026",cat:"MELI",   broker:"Nexo",    activo:"MELI",valor_c:158.03, valor_a:158.03, pl:0,     pl_pct:null, pl_ok:false},
-    {fecha:"26-mar-2026",cat:"Nexo",   broker:"Nexo",    activo:"USDT",valor_c:410.00, valor_a:410.00, pl:0,     pl_pct:null, pl_ok:false},
-    {fecha:"26-mar-2026",cat:"Nexo",   broker:"Nexo",    activo:"USDT",valor_c:408.74, valor_a:408.74, pl:0,     pl_pct:null, pl_ok:false},
+    // FCI (P&L confiable)
+    {fecha:"1-oct-2025", cat:"FCI USD",broker:"Ualá",    activo:"USD", valor_c:1285.82,valor_a:1473.31,pl:187.49, pl_pct:14.58,pl_ok:true},
+    {fecha:"30-dic-2025",cat:"FCI USD",broker:"Santander",activo:"USD",valor_c:2068.27,valor_a:2072.36,pl:4.09,   pl_pct:0.20, pl_ok:true},
+    // Nexo — ahora con valores reales de Google Finance
+    {fecha:"26-ene-2026",cat:"Bitcoin",broker:"Nexo",activo:"BTC", valor_c:48.97, valor_a:28.12, pl:-20.85,pl_pct:-42.58,pl_ok:true},
+    {fecha:"26-ene-2026",cat:"ETF",    broker:"Nexo",activo:"SPY", valor_c:375.94,valor_a:376.63,pl:0.69,  pl_pct:0.18, pl_ok:true},
+    {fecha:"26-ene-2026",cat:"ETF",    broker:"Nexo",activo:"XLV", valor_c:89.66, valor_a:91.12, pl:1.46,  pl_pct:1.62, pl_ok:true},
+    {fecha:"26-ene-2026",cat:"ETF",    broker:"Nexo",activo:"XLE", valor_c:150.42,valor_a:149.32,pl:-1.10, pl_pct:-0.73,pl_ok:true},
+    {fecha:"26-ene-2026",cat:"ETF",    broker:"Nexo",activo:"SPYG",valor_c:72.81, valor_a:77.31, pl:4.50,  pl_pct:6.19, pl_ok:true},
+    {fecha:"27-mar-2026",cat:"ETF",    broker:"Nexo",activo:"MSFT",valor_c:89.00, valor_a:87.82, pl:-1.18, pl_pct:-1.33,pl_ok:true},
+    {fecha:"27-mar-2026",cat:"USDT",   broker:"Nexo",activo:"USDT",valor_c:845.00,valor_a:850.94,pl:5.94,  pl_pct:0.70, pl_ok:true},
+    {fecha:"27-mar-2026",cat:"MELI",   broker:"Nexo",activo:"MELI",valor_c:158.03,valor_a:156.48,pl:-1.55, pl_pct:-0.98,pl_ok:true},
   ],
 };
 
