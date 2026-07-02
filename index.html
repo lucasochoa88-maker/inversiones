@@ -148,7 +148,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
 // La URL del Apps Script se guarda en localStorage del browser
 // → persiste entre sesiones, no hay que pegarla cada vez
-let SCRIPT_URL = localStorage.getItem('portfolio_script_url') || 'https://script.google.com/macros/s/AKfycbw9OjVLxq76oNkldccgSaNE_BbxtYBfxa6OYJViGEQ-g_X_HVVfX7dAf9wMqEd63LC5/exec';
+let SCRIPT_URL = localStorage.getItem('portfolio_script_url') || 'https://script.google.com/macros/s/AKfycbyc1jqO1YEp912nNEGjTlF3NDP18F1L2LkKN0ZS3YIvt-AwP969c4zjweK4hBIrMZY/exec';
 
 function guardarURL() {
   const url = document.getElementById('script-url').value.trim();
@@ -543,7 +543,7 @@ function render(){
   // ── ARS ──
   const arsSec = ars.length===0 ? '' : `
     <div class="sec"><span class="sec-lbl" style="color:var(--gold)">▸ Acciones ARS 🇦🇷</span><div class="sec-line" style="background:linear-gradient(to right,rgba(240,180,41,.4),transparent)"></div><span class="sec-tag" style="background:rgba(240,180,41,.1);color:var(--gold);border:1px solid rgba(240,180,41,.2)">en pesos argentinos</span></div>
-    <div class="notice" style="background:rgba(240,180,41,.06);border-color:rgba(59, 130, 246, 0.3);color:var(--gold)">🇦🇷 Estas posiciones están valuadas en <strong>pesos argentinos (ARS)</strong> — no se suman al total en USD del portfolio.</div>
+    <div class="notice" style="background:rgba(240,180,41,.06);border-color:rgba(240,180,41,.2);color:var(--gold)">🇦🇷 Estas posiciones están valuadas en <strong>pesos argentinos (ARS)</strong> — no se suman al total en USD del portfolio.</div>
     <div class="card"><div class="ch"><span class="ct">Posiciones en ARS</span><span class="badge bo">${ars.length} activo${ars.length>1?'s':''}</span></div>
       <div style="padding:0 14px 12px;overflow-x:auto"><table>
         <thead><tr><th>Activo</th><th>Broker</th><th>Tipo</th><th class="r">Fecha</th><th class="r">Cant</th><th class="r">Compra ARS</th><th class="r">Actual ARS</th><th class="r">P&L</th></tr></thead>
