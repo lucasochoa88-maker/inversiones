@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -268,6 +267,32 @@ function parseResto(txt) {
 }
 
 // ════════════════════════════════════════
+//  PARSEAR SHEET ARS
+// ════════════════════════════════════════
+function parseArs(txt) {
+  const rows = parseCSV(txt);
+  const items = [];
+  for(let i=2;i<rows.length;i++){
+    const r=rows[i];
+    if(!r||!r[0]||!r[0].trim())continue;
+    const vc=pn(r[6]), va=pn(r[7]), pl=pn(r[8]), plp=pn(r[9]);
+    if(!va||va===0)continue;
+    items.push({
+      fecha:(r[0]||'').trim(),
+      cat:(r[1]||'').trim(),
+      broker:(r[2]||'').trim(),
+      activo:(r[3]||'').trim(),
+      cant:pn(r[5])||1,
+      valor_c: vc||0,
+      valor_a: va,
+      pl: pl||0,
+      pl_pct: plp,
+    });
+  }
+  return items;
+}
+
+// ════════════════════════════════════════
 //  FETCH
 // ════════════════════════════════════════
 async function fetchSheet(sheet) {
@@ -333,6 +358,9 @@ const FALLBACK = {
     {fecha:"27-mar-2026",cat:"USDT",   broker:"Nexo",activo:"USDT",valor_c:845.00,valor_a:850.94,pl:5.94,  pl_pct:0.70, pl_ok:true},
     {fecha:"27-mar-2026",cat:"MELI",   broker:"Nexo",activo:"MELI",valor_c:158.03,valor_a:156.48,pl:-1.55, pl_pct:-0.98,pl_ok:true},
   ],
+  ars:[
+    {fecha:"2-ene-2026",cat:"Acción",broker:"Santander",activo:"YPFD",cant:3,valor_c:166350,valor_a:211800,pl:45450,pl_pct:21.46},
+  ],
 };
 
 // ════════════════════════════════════════
@@ -352,9 +380,10 @@ async function loadAll() {
   }
 
   try {
-    const [csvCed, csvResto] = await Promise.all([
+    const [csvCed, csvResto, csvArs] = await Promise.all([
       fetchSheet('cedears'),
       fetchSheet('resto'),
+      fetchSheet('ars'),
     ]);
     const ced = parseCedears(csvCed);
     STATE = {
@@ -363,6 +392,7 @@ async function loadAll() {
       cartera: ced.cartera,
       totales: ced.totales,
       resto:   parseResto(csvResto),
+      ars:     parseArs(csvArs),
       source:  'live',
     };
     setStatus('en vivo','live');
@@ -401,6 +431,7 @@ function s(arr,k){return arr.reduce((t,o)=>t+(o[k]||0),0);}
 // ════════════════════════════════════════
 function render(){
   const {mine,ali,cartera,resto} = STATE;
+  const ars = STATE.ars || [];
   const mTC=s(mine,'valor_c'), mTA=s(mine,'valor_hoy');
   const aTC=s(ali,'valor_c'),  aTA=s(ali,'valor_hoy');
   const cedTC=mTC+aTC,         cedTA=mTA+aTA;
@@ -408,12 +439,16 @@ function render(){
   const granTC=cedTC+resTC, granTA=cedTA+resTA;
   const COLORS={IOL:'#00c896',Santander:'#ff6b4a',Nexo:'#3d8fff','Ualá':'#f0b429'};
 
+  const arsTC=ars.reduce((t,r)=>t+r.valor_c,0), arsTA=ars.reduce((t,r)=>t+r.valor_a,0);
+  const arsPL=arsTA-arsTC;
+
   // ── KPIs ──
   const kpis = `<div class="kpi-row">
     <div class="kpi b"><div class="kl">Total portfolio</div><div class="kv">${usd(granTA,0)}</div><div class="ks ${pc(granTA-granTC)}">${usd(granTA-granTC)} · ${pct((granTA-granTC)/granTC*100)}</div></div>
     <div class="kpi g"><div class="kl">CEDEARs</div><div class="kv">${usd(cedTA,0)}</div><div class="ks ${pc(cedTA-cedTC)}">${usd(cedTA-cedTC)} · ${pct((cedTA-cedTC)/cedTC*100)}</div></div>
     <div class="kpi o"><div class="kl">Nexo · Ualá · FCI</div><div class="kv">${usd(resTA,0)}</div><div class="ks muted">valor actual</div></div>
     <div class="kpi p"><div class="kl">Ali 👶🏻</div><div class="kv" style="color:var(--ali)">${usd(aTA,0)}</div><div class="ks ${pc(aTA-aTC)}">${usd(aTA-aTC)} · ${pct((aTA-aTC)/aTC*100)}</div></div>
+    ${ars.length>0?`<div class="kpi" style="border-color:rgba(240,180,41,.3)"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold)"></div><div class="kl">Acciones ARS 🇦🇷</div><div class="kv" style="color:var(--gold);font-size:16px">$ ${arsTA.toLocaleString('es-AR',{maximumFractionDigits:0})}</div><div class="ks ${pc(arsPL)}">${pct(arsPL/arsTC*100)} · en pesos</div></div>`:''}
   </div>`;
 
   // ── DONUT + BROKERS ──
@@ -505,7 +540,36 @@ function render(){
       <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Por broker</span></div><div class="cb">${barsH2}</div></div>
     </div>`;
 
-  document.getElementById('app').innerHTML = kpis + overview + cedSec + restoSec;
+  // ── ARS ──
+  const arsSec = ars.length===0 ? '' : `
+    <div class="sec"><span class="sec-lbl" style="color:var(--gold)">▸ Acciones ARS 🇦🇷</span><div class="sec-line" style="background:linear-gradient(to right,rgba(240,180,41,.4),transparent)"></div><span class="sec-tag" style="background:rgba(240,180,41,.1);color:var(--gold);border:1px solid rgba(240,180,41,.2)">en pesos argentinos</span></div>
+    <div class="notice" style="background:rgba(240,180,41,.06);border-color:rgba(240,180,41,.2);color:var(--gold)">🇦🇷 Estas posiciones están valuadas en <strong>pesos argentinos (ARS)</strong> — no se suman al total en USD del portfolio.</div>
+    <div class="card"><div class="ch"><span class="ct">Posiciones en ARS</span><span class="badge bo">${ars.length} activo${ars.length>1?'s':''}</span></div>
+      <div style="padding:0 14px 12px;overflow-x:auto"><table>
+        <thead><tr><th>Activo</th><th>Broker</th><th>Tipo</th><th class="r">Fecha</th><th class="r">Cant</th><th class="r">Compra ARS</th><th class="r">Actual ARS</th><th class="r">P&L</th></tr></thead>
+        <tbody>${ars.map(r=>{
+          const bc=r.pl>=0?'bg':'br';
+          return`<tr>
+            <td><span class="tk">${r.activo}</span></td>
+            <td><span class="tag">${r.broker}</span></td>
+            <td><span class="tag">${r.cat}</span></td>
+            <td class="r" style="color:var(--dim);font-size:10px">${r.fecha}</td>
+            <td class="r">${r.cant}</td>
+            <td class="r">$ ${r.valor_c.toLocaleString('es-AR',{maximumFractionDigits:0})}</td>
+            <td class="r">$ ${r.valor_a.toLocaleString('es-AR',{maximumFractionDigits:0})}</td>
+            <td class="r"><span class="badge ${bc}">${r.pl_pct!=null?pct(r.pl_pct):'—'}</span></td>
+          </tr>`;
+        }).join('')}</tbody>
+        <tfoot><tr style="border-top:1px solid var(--border)">
+          <td colspan="5" class="muted" style="padding-top:8px">Total ARS</td>
+          <td class="r muted" style="padding-top:8px">$ ${arsTC.toLocaleString('es-AR',{maximumFractionDigits:0})}</td>
+          <td class="r" style="padding-top:8px">$ ${arsTA.toLocaleString('es-AR',{maximumFractionDigits:0})}</td>
+          <td class="r ${pc(arsPL)}" style="padding-top:8px">${pct(arsPL/arsTC*100)}</td>
+        </tr></tfoot>
+      </table></div>
+    </div>`;
+
+  document.getElementById('app').innerHTML = kpis + overview + cedSec + restoSec + arsSec;
 }
 
 // ════════════════════════════════════════
