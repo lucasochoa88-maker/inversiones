@@ -529,21 +529,23 @@ function buildDashboard(rows) {
   const pctMari       = ingresosMari  > 0 ? ((gastosMari /ingresosMari )*100).toFixed(0) : 0;
 
   // helper: color del saldo
-  const saldoColor = s => s >= 0 ? '#639922' : '#E24B4A';
+
 
   // Sub-fila compacta para cada persona
-  const subRow = (gastos, saldo, pct, color) => `
+  const sColor = s => s >= 0 ? '#639922' : '#E24B4A';
+  const bColor = p => p > 80 ? '#E24B4A' : p > 55 ? '#EF9F27' : '#378ADD';
+  const subRow = (gastos, saldo, pct) => `
     <div style="margin-top:9px;padding-top:9px;border-top:0.5px solid #222;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
         <span style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.04em;">Gastó</span>
-        <span style="font-size:12px;color:#888;">${fmt(gastos)}</span>
+        <span style="font-size:11px;color:#666;">${fmt(gastos)}</span>
       </div>
       <div style="background:#1e1e1e;border-radius:3px;height:3px;margin-bottom:6px;">
-        <div style="width:${Math.min(100,pct)}%;height:3px;border-radius:3px;background:${pct>80?'#E24B4A':pct>55?'#EF9F27':'#378ADD'};"></div>
+        <div style="width:${pct}%;height:3px;border-radius:3px;background:${bColor(Number(pct))};"></div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:baseline;">
-        <span style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.04em;">Le queda</span>
-        <span style="font-size:14px;font-weight:600;color:${color};">${fmt(saldo)}</span>
+        <span style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.04em;">Queda</span>
+        <span style="font-size:14px;font-weight:600;color:${sColor(saldo)};">${fmt(saldo)}</span>
       </div>
     </div>`;
 
@@ -552,12 +554,12 @@ function buildDashboard(rows) {
     <div class="metric">
       <p class="metric-label">Lucas</p>
       <p class="metric-value">${fmt(ingresosLucas)}</p>
-      ${ingresosLucas > 0 ? subRow(gastosLucas, saldoLucas, pctLucas, saldoColor(saldoLucas)) : ''}
+      ${ingresosLucas > 0 ? subRow(gastosLucas, saldoLucas, pctLucas) : ''}
     </div>
     <div class="metric">
       <p class="metric-label">Mariana</p>
       <p class="metric-value">${ingresosMari > 0 ? fmt(ingresosMari) : '<span style="font-size:13px;color:#444;">—</span>'}</p>
-      ${ingresosMari > 0 ? subRow(gastosMari, saldoMari, pctMari, saldoColor(saldoMari)) : ''}
+      ${ingresosMari > 0 ? subRow(gastosMari, saldoMari, pctMari) : ''}
     </div>
     <div class="metric"><p class="metric-label">Total ingresos</p><p class="metric-value">${fmt(totalIngresos)}</p></div>
     <div class="metric"><p class="metric-label">Total gastos</p><p class="metric-value danger">${fmt(totalGastos)}</p></div>
