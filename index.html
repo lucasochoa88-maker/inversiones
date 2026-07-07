@@ -151,12 +151,14 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <div class="tab" onclick="showTab('evolucion')">Evolución</div>
   <div class="tab" onclick="showTab('analisis')">Análisis</div>
   <div class="tab" onclick="showTab('alertas')">Alertas</div>
+  <div class="tab" onclick="showTab('casa')">🏠 Casa Propia</div>
 </div>
 
 <div id="tab-portfolio" class="tab-panel active"><div class="loading"><div class="spin">⟳</div><br>Cargando...</div></div>
 <div id="tab-evolucion" class="tab-panel"></div>
 <div id="tab-analisis" class="tab-panel"></div>
 <div id="tab-alertas" class="tab-panel"></div>
+<div id="tab-casa" class="tab-panel"></div>
 
 <script>
 // ════════════════════════════════════════════════════════
@@ -165,16 +167,16 @@ tr:hover td{background:rgba(255,255,255,.02)}
 let activeTab = 'portfolio';
 function showTab(id) {
   document.querySelectorAll('.tab').forEach((t,i)=>{
-    const ids=['portfolio','evolucion','analisis','alertas'];
+    const ids=['portfolio','evolucion','analisis','alertas','casa'];
     t.classList.toggle('active', ids[i]===id);
   });
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   activeTab = id;
-  // render on first open
   if(id==='evolucion' && STATE.source!=='empty') renderEvolucion();
   if(id==='analisis'  && STATE.source!=='empty') renderAnalisis();
   if(id==='alertas'   && STATE.source!=='empty') renderAlertas();
+  if(id==='casa'      && STATE.source!=='empty') renderCasa();
 }
 
 // ════════════════════════════════════════════════════════
@@ -342,6 +344,7 @@ function renderAll() {
   if(activeTab==='evolucion') renderEvolucion();
   if(activeTab==='analisis')  renderAnalisis();
   if(activeTab==='alertas')   renderAlertas();
+  if(activeTab==='casa')      renderCasa();
 }
 
 // ════════════════════════════════════════════════════════
@@ -743,6 +746,93 @@ function renderAlertas() {
     ${alertHTML}`;
 
   document.getElementById('tab-alertas').innerHTML=html;
+}
+
+// ════════════════════════════════════════════════════════
+//  TAB 5: CASA PROPIA
+// ════════════════════════════════════════════════════════
+function renderCasa() {
+  const OBJETIVO = 45000;
+  const {mine,ali,resto} = STATE;
+  const actual = s(mine,'valor_hoy') + s(ali,'valor_hoy') + s(resto,'valor_a');
+  const pctAlcanzado = Math.min(actual / OBJETIVO * 100, 100);
+  const falta = Math.max(OBJETIVO - actual, 0);
+  const listo = actual >= OBJETIVO;
+
+  // Arco SVG
+  const R = 80, stroke = 16;
+  const circ = Math.PI * R; // semicírculo
+  const filled = pctAlcanzado / 100 * circ;
+  const color = listo ? '#00c896' : pctAlcanzado >= 75 ? '#00c896' : pctAlcanzado >= 50 ? '#f0b429' : '#3d8fff';
+
+  const html = `
+    <div style="max-width:520px;margin:0 auto;text-align:center;padding-top:20px">
+
+      <!-- Arco de progreso -->
+      <div style="position:relative;display:inline-block;margin-bottom:8px">
+        <svg width="240" height="130" viewBox="0 0 240 130">
+          <!-- Track -->
+          <path d="M 20 120 A 100 100 0 0 1 220 120"
+            fill="none" stroke="#1e2a3a" stroke-width="${stroke}" stroke-linecap="round"/>
+          <!-- Fill -->
+          <path d="M 20 120 A 100 100 0 0 1 220 120"
+            fill="none" stroke="${color}" stroke-width="${stroke}" stroke-linecap="round"
+            stroke-dasharray="${filled} ${circ}"
+            style="transition:stroke-dasharray 1s ease"/>
+          <!-- Valor actual -->
+          <text x="120" y="90" text-anchor="middle" font-family="IBM Plex Mono" font-size="22" font-weight="600" fill="#eaf2ff">${pctAlcanzado.toFixed(1)}%</text>
+          <text x="120" y="110" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#6b7f96">del objetivo</text>
+        </svg>
+      </div>
+
+      <!-- Números principales -->
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6b7f96;margin-bottom:24px">
+        ${listo
+          ? `<span style="color:#00c896;font-size:16px;font-weight:600">🏠 Objetivo alcanzado</span>`
+          : `Faltan <span style="color:#eaf2ff;font-weight:600">${usd(falta,0)}</span>`
+        }
+      </div>
+
+      <!-- Barra lineal -->
+      <div style="background:#1e2a3a;border-radius:6px;height:10px;margin:0 0 28px;overflow:hidden">
+        <div style="height:100%;width:${pctAlcanzado}%;background:${color};border-radius:6px;transition:width 1s ease"></div>
+      </div>
+
+      <!-- KPIs -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:28px">
+        <div style="background:#161d29;border:1px solid #1e2a3a;border-radius:9px;padding:14px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6b7f96;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Portfolio actual</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#eaf2ff">${usd(actual,0)}</div>
+        </div>
+        <div style="background:#161d29;border:1px solid ${color}44;border-radius:9px;padding:14px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6b7f96;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Objetivo</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:${color}">${usd(OBJETIVO,0)}</div>
+        </div>
+        <div style="background:#161d29;border:1px solid #1e2a3a;border-radius:9px;padding:14px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6b7f96;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">${listo?'Excedente':'Falta'}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:${listo?'#00c896':'#eaf2ff'}">${usd(Math.abs(OBJETIVO-actual),0)}</div>
+        </div>
+      </div>
+
+      <!-- Milestones -->
+      <div style="text-align:left">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6b7f96;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px">Hitos</div>
+        ${[25,50,75,100].map(hito=>{
+          const hitVal = OBJETIVO * hito / 100;
+          const done = actual >= hitVal;
+          return `<div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #1e2a3a22">
+            <div style="width:22px;height:22px;border-radius:50%;border:2px solid ${done?color:'#1e2a3a'};background:${done?color+'22':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              ${done?`<span style="color:${color};font-size:11px">✓</span>`:''}
+            </div>
+            <div style="flex:1;font-family:'IBM Plex Mono',monospace;font-size:11px;color:${done?'#eaf2ff':'#6b7f96'}">${usd(hitVal,0)} <span style="color:#6b7f96">(${hito}%)</span></div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:${done?color:'#6b7f96'}">${done?'✅ alcanzado':'pendiente'}</div>
+          </div>`;
+        }).join('')}
+      </div>
+
+    </div>`;
+
+  document.getElementById('tab-casa').innerHTML = html;
 }
 
 // ════════════════════════════════════════════════════════
