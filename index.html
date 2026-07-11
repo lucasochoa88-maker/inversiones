@@ -398,7 +398,7 @@ function renderPortfolio(){
   const COLORS={IOL:'#00c896',Santander:'#ff6b4a',Nexo:'#3d8fff','Ualá':'#f0b429'};
 
   const kpis=`<div class="kpi-row">
-    <div class="kpi b"><div class="kl">Total portfolio</div><div class="kv">${usd(granTA,0)}</div><div class="ks ${pc(granTA-granTC)}">${usd(granTA-granTC)} · ${pct((granTA-granTC)/granTC*100)}</div></div>
+    <div class="kpi b"><div class="kl">Total portfolio (sin Ali)</div><div class="kv">${usd(mTA+resTA,0)}</div><div class="ks ${pc((mTA+resTA)-(mTC+resTC))}">${usd((mTA+resTA)-(mTC+resTC))} · ${pct(((mTA+resTA)-(mTC+resTC))/(mTC+resTC)*100)}</div></div>
     <div class="kpi g"><div class="kl">CEDEARs</div><div class="kv">${usd(cedTA,0)}</div><div class="ks ${pc(cedTA-cedTC)}">${usd(cedTA-cedTC)} · ${pct((cedTA-cedTC)/cedTC*100)}</div></div>
     <div class="kpi o"><div class="kl">Nexo · Ualá · FCI</div><div class="kv">${usd(resTA,0)}</div><div class="ks muted">valor actual</div></div>
     <div class="kpi p"><div class="kl">Ali 👶🏻</div><div class="kv" style="color:var(--ali)">${usd(aTA,0)}</div><div class="ks ${pc(aTA-aTC)}">${usd(aTA-aTC)} · ${pct((aTA-aTC)/aTC*100)}</div></div>
@@ -627,7 +627,7 @@ function renderAnalisis(){
     </div>
 
     <div class="card"><div class="ch"><span class="ct">Waterfall · quién aporta tu ganancia</span><span class="badge bb">P&L por activo</span></div>
-      <div style="padding:16px;height:240px"><canvas id="chartWaterfall"></canvas></div>
+      <div style="padding:16px;height:320px"><canvas id="chartWaterfall"></canvas></div>
     </div>
 
     <div class="g2">
@@ -657,7 +657,7 @@ function renderAnalisis(){
         options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
           plugins:{legend:{display:false},tooltip:{enabled:!PRIVACY}},
           scales:{x:{ticks:PRIVACY?{display:false}:{color:'#6b7f96',font:{size:9},callback:v=>'$'+v},grid:{color:'#1e2a3a'}},
-                  y:{ticks:{color:'#c8d6e8',font:{family:'IBM Plex Mono',size:10}},grid:{display:false}}}}});
+                  y:{ticks:{color:'#c8d6e8',font:{family:'IBM Plex Mono',size:10},autoSkip:false},grid:{display:false}}}}});
     }
   },100);
 }
