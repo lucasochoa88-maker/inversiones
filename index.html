@@ -17,12 +17,11 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;line-height:1.5}
 
-/* ── HEADER ── */
-.hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 24px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 24px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100;flex-wrap:wrap;gap:8px}
 .logo{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--hi)}
 .logo em{color:var(--accent);font-style:normal}
 .sub{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px}
-.hdr-right{display:flex;align-items:center;gap:10px}
+.hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .chip{font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:3px;display:flex;align-items:center;gap:5px}
 .chip-live{background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.2);color:var(--accent)}
 .chip-warn{background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.2);color:var(--gold)}
@@ -33,16 +32,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .last-sync{font-family:var(--mono);font-size:9px;color:var(--dim)}
 .btn-sm{font-family:var(--mono);font-size:9px;padding:3px 10px;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--dim)}
 .btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm.privacy-on{border-color:var(--gold);color:var(--gold)}
 
-/* ── TABS ── */
-.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 24px;background:var(--bg)}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 24px;background:var(--bg);overflow-x:auto}
 .tab{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;cursor:pointer;color:var(--dim);border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
 .tab:hover{color:var(--text)}
 .tab.active{color:var(--hi);border-bottom-color:var(--accent)}
 .tab-panel{display:none;padding:20px 24px}
 .tab-panel.active{display:block}
 
-/* ── LAYOUT ── */
 .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:18px}
 .kpi{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:13px 15px;position:relative;overflow:hidden}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
@@ -72,7 +70,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .bp{background:var(--ali-dim);color:var(--ali);border:1px solid var(--ali-bd)}
 .bw{background:rgba(107,127,150,.1);color:var(--dim);border:1px solid rgba(107,127,150,.2)}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
 
 table{width:100%;border-collapse:collapse}
 th{font-family:var(--mono);font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1.2px;padding:0 6px 9px 0;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
@@ -106,7 +103,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .spin{display:inline-block;animation:rotate 1.2s linear infinite;font-size:22px;margin-bottom:10px}
 @keyframes rotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 
-/* ── ALERTAS ── */
 .alert-card{border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px}
 .alert-warn{background:rgba(255,107,74,.07);border:1px solid rgba(255,107,74,.25)}
 .alert-ok{background:rgba(0,200,150,.07);border:1px solid rgba(0,200,150,.25)}
@@ -116,20 +112,18 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .alert-title{font-family:var(--mono);font-size:11px;font-weight:600;margin-bottom:4px}
 .alert-body{font-size:12px;color:var(--dim);line-height:1.6}
 
-/* ── PROYECCIÓN ALI ── */
-.proj-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-.proj-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;flex:1;min-width:110px;text-align:center}
-.proj-yr{font-family:var(--mono);font-size:9px;color:var(--dim);margin-bottom:4px}
-.proj-val{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--ali)}
-
-/* ── SECTOR MAP ── */
 .sector-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;padding:14px 16px}
 .sector-box{border-radius:8px;padding:10px 12px;border:1px solid var(--border);background:var(--surface)}
 .sector-name{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--hi);margin-bottom:3px}
 .sector-pct{font-family:var(--mono);font-size:18px;font-weight:600}
 .sector-bar{height:3px;border-radius:2px;margin-top:6px;opacity:.7}
 
-@media(max-width:800px){.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr}.kpi-row{grid-template-columns:1fr 1fr}.tabs{overflow-x:auto}.tab{font-size:9px;padding:10px 12px}}
+/* sliders / inputs */
+input[type=range]{width:100%;accent-color:var(--blue)}
+.sim-input{font-family:var(--mono);font-size:12px;background:var(--surface);border:1px solid var(--border);color:var(--hi);border-radius:5px;padding:6px 10px;width:110px;outline:none;text-align:right}
+.sim-input:focus{border-color:var(--blue)}
+
+@media(max-width:800px){.g2{grid-template-columns:1fr}.kpi-row{grid-template-columns:1fr 1fr}.tab{font-size:9px;padding:10px 12px}}
 </style>
 </head>
 <body>
@@ -140,6 +134,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="sub">CEDEARs · Nexo · Ualá · Santander</div>
   </div>
   <div class="hdr-right">
+    <button class="btn-sm" id="privacy-btn" onclick="togglePrivacy()">👁️ ocultar montos</button>
     <span id="sync-status" class="chip chip-warn"><span class="dot dot-o"></span>cargando</span>
     <span id="sync-time" class="last-sync"></span>
     <button class="btn-sm" onclick="loadAll()">↻ actualizar</button>
@@ -161,32 +156,44 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <div id="tab-casa" class="tab-panel"></div>
 
 <script>
-// ════════════════════════════════════════════════════════
-//  TABS
-// ════════════════════════════════════════════════════════
-let activeTab = 'portfolio';
-function showTab(id) {
+// ════════ PRIVACY MODE ════════
+let PRIVACY = localStorage.getItem('portfolio_privacy')==='1';
+function togglePrivacy(){
+  PRIVACY=!PRIVACY;
+  localStorage.setItem('portfolio_privacy',PRIVACY?'1':'0');
+  updatePrivacyBtn();
+  renderAll();
+}
+function updatePrivacyBtn(){
+  const b=document.getElementById('privacy-btn');
+  b.textContent=PRIVACY?'🙈 mostrar montos':'👁️ ocultar montos';
+  b.classList.toggle('privacy-on',PRIVACY);
+}
+
+// ════════ TABS ════════
+let activeTab='portfolio';
+function showTab(id){
   document.querySelectorAll('.tab').forEach((t,i)=>{
     const ids=['portfolio','evolucion','analisis','alertas','casa'];
-    t.classList.toggle('active', ids[i]===id);
+    t.classList.toggle('active',ids[i]===id);
   });
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
-  activeTab = id;
-  if(id==='evolucion' && STATE.source!=='empty') renderEvolucion();
-  if(id==='analisis'  && STATE.source!=='empty') renderAnalisis();
-  if(id==='alertas'   && STATE.source!=='empty') renderAlertas();
-  if(id==='casa'      && STATE.source!=='empty') renderCasa();
+  activeTab=id;
+  if(STATE.source!=='empty'){
+    if(id==='evolucion')renderEvolucion();
+    if(id==='analisis')renderAnalisis();
+    if(id==='alertas')renderAlertas();
+    if(id==='casa')renderCasa();
+  }
 }
 
-// ════════════════════════════════════════════════════════
-//  CONFIG & FETCH
-// ════════════════════════════════════════════════════════
-let SCRIPT_URL = localStorage.getItem('portfolio_script_url') || 'https://script.google.com/macros/s/AKfycbymaOoBGnUSlOQEmaa8YlMdNh6tiTtcjeZNn5fJV0PSdYvtChODbs1MLhvtVERmYe_i/exec';
-document.getElementById('setup-banner') && (document.getElementById('setup-banner').style.display='none');
+// ════════ CONFIG & FETCH ════════
+let SCRIPT_URL=localStorage.getItem('portfolio_script_url')||'https://script.google.com/macros/s/AKfycbymaOoBGnUSlOQEmaa8YlMdNh6tiTtcjeZNn5fJV0PSdYvtChODbs1MLhvtVERmYe_i/exec';
+const NEXO_DAILY_INTEREST = 0.17; // USD/día que paga Nexo hoy (dato real del usuario)
 
-function parseCSV(txt) {
-  const rows=[]; let cur='',inQ=false,row=[];
+function parseCSV(txt){
+  const rows=[];let cur='',inQ=false,row=[];
   for(let i=0;i<txt.length;i++){
     const c=txt[i];
     if(c==='"'){inQ=!inQ;continue}
@@ -202,8 +209,7 @@ function pn(s){
   const n=parseFloat(s.replace(/[$,%]/g,'').replace(/,/g,''));
   return isNaN(n)?null:n;
 }
-
-function parseCedears(txt) {
+function parseCedears(txt){
   const rows=parseCSV(txt),mine=[],ali=[],cartera=[];let totales={};
   for(let i=3;i<rows.length;i++){
     const r=rows[i];if(!r||!r[0])continue;
@@ -223,8 +229,7 @@ function parseCedears(txt) {
   }
   return{mine,ali,cartera,totales};
 }
-
-function parseResto(txt) {
+function parseResto(txt){
   const rows=parseCSV(txt),items=[];
   for(let i=2;i<rows.length;i++){
     const r=rows[i];if(!r||!r[0]||!r[0].trim())continue;
@@ -236,8 +241,7 @@ function parseResto(txt) {
   }
   return items;
 }
-
-function parseArs(txt) {
+function parseArs(txt){
   const rows=parseCSV(txt),items=[];
   for(let i=2;i<rows.length;i++){
     const r=rows[i];if(!r||!r[0]||!r[0].trim())continue;
@@ -247,137 +251,160 @@ function parseArs(txt) {
   }
   return items;
 }
-
-async function fetchSheet(sheet) {
-  if(!SCRIPT_URL) throw new Error('sin_url');
+async function fetchSheet(sheet){
+  if(!SCRIPT_URL)throw new Error('sin_url');
   const res=await fetch(`${SCRIPT_URL}?sheet=${sheet}`,{signal:AbortSignal.timeout(12000)});
-  if(!res.ok) throw new Error('HTTP '+res.status);
+  if(!res.ok)throw new Error('HTTP '+res.status);
   const txt=await res.text();
-  if(!txt||txt.length<50) throw new Error('vacío');
-  if(txt.startsWith('{')) throw new Error(JSON.parse(txt).error||'error');
+  if(!txt||txt.length<50)throw new Error('vacío');
+  if(txt.startsWith('{'))throw new Error(JSON.parse(txt).error||'error');
   return txt;
 }
 
-// ════════════════════════════════════════════════════════
-//  FALLBACK DATA
-// ════════════════════════════════════════════════════════
-const FALLBACK = {
+// ════════ FALLBACK ════════
+const FALLBACK={
   mine:[
     {ticker:"META",broker:"IOL",fecha_c:"Nov 27, 2025",valor_c:26.50,valor_hoy:24.26,var_pct:-8.47},
-    {ticker:"SPY", broker:"IOL",fecha_c:"Nov 27, 2025",valor_c:101.31,valor_hoy:110.47,var_pct:9.05},
+    {ticker:"SPY",broker:"IOL",fecha_c:"Nov 27, 2025",valor_c:101.31,valor_hoy:110.47,var_pct:9.05},
     {ticker:"AAPL",broker:"IOL",fecha_c:"Nov 27, 2025",valor_c:13.67,valor_hoy:15.24,var_pct:11.52},
     {ticker:"META",broker:"IOL",fecha_c:"Nov 27, 2025",valor_c:26.50,valor_hoy:24.26,var_pct:-8.47},
     {ticker:"AAPL",broker:"IOL",fecha_c:"Nov 27, 2025",valor_c:13.67,valor_hoy:15.24,var_pct:11.52},
     {ticker:"AAPL",broker:"IOL",fecha_c:"Nov 27, 2025",valor_c:13.67,valor_hoy:15.24,var_pct:11.52},
-    {ticker:"XLK", broker:"IOL",fecha_c:"Dec 23, 2025",valor_c:6.27,valor_hoy:7.77,var_pct:23.93},
-    {ticker:"QQQ", broker:"IOL",fecha_c:"Dec 23, 2025",valor_c:34.04,valor_hoy:35.36,var_pct:3.87},
+    {ticker:"XLK",broker:"IOL",fecha_c:"Dec 23, 2025",valor_c:6.27,valor_hoy:7.77,var_pct:23.93},
+    {ticker:"QQQ",broker:"IOL",fecha_c:"Dec 23, 2025",valor_c:34.04,valor_hoy:35.36,var_pct:3.87},
     {ticker:"META",broker:"IOL",fecha_c:"Dec 23, 2025",valor_c:27.48,valor_hoy:24.26,var_pct:-11.74},
-    {ticker:"SPY", broker:"IOL",fecha_c:"Jan 2, 2026", valor_c:168.42,valor_hoy:184.12,var_pct:9.32},
-    {ticker:"SPY", broker:"IOL",fecha_c:"Jan 2, 2026", valor_c:168.42,valor_hoy:184.12,var_pct:9.32},
-    {ticker:"QQQ", broker:"Santander",fecha_c:"Dec 30, 2025",valor_c:61.02,valor_hoy:72.01,var_pct:18.00},
-    {ticker:"QQQ", broker:"Santander",fecha_c:"Jan 2, 2026", valor_c:181.61,valor_hoy:216.03,var_pct:18.95},
-    {ticker:"QQQ", broker:"Santander",fecha_c:"Jan 2, 2026", valor_c:181.61,valor_hoy:216.03,var_pct:18.95},
-    {ticker:"XLK", broker:"Santander",fecha_c:"Jan 2, 2026", valor_c:207.43,valor_hoy:260.41,var_pct:25.54},
-    {ticker:"META",broker:"Santander",fecha_c:"Jan 2, 2026", valor_c:106.92,valor_hoy:97.02,var_pct:-9.25},
-    {ticker:"SPY", broker:"Santander",fecha_c:"Jul 2, 2026", valor_c:324.98,valor_hoy:319.14,var_pct:-1.80},
+    {ticker:"SPY",broker:"IOL",fecha_c:"Jan 2, 2026",valor_c:168.42,valor_hoy:184.12,var_pct:9.32},
+    {ticker:"SPY",broker:"IOL",fecha_c:"Jan 2, 2026",valor_c:168.42,valor_hoy:184.12,var_pct:9.32},
+    {ticker:"QQQ",broker:"Santander",fecha_c:"Dec 30, 2025",valor_c:61.02,valor_hoy:72.01,var_pct:18.00},
+    {ticker:"QQQ",broker:"Santander",fecha_c:"Jan 2, 2026",valor_c:181.61,valor_hoy:216.03,var_pct:18.95},
+    {ticker:"QQQ",broker:"Santander",fecha_c:"Jan 2, 2026",valor_c:181.61,valor_hoy:216.03,var_pct:18.95},
+    {ticker:"XLK",broker:"Santander",fecha_c:"Jan 2, 2026",valor_c:207.43,valor_hoy:260.41,var_pct:25.54},
+    {ticker:"META",broker:"Santander",fecha_c:"Jan 2, 2026",valor_c:106.92,valor_hoy:97.02,var_pct:-9.25},
+    {ticker:"SPY",broker:"Santander",fecha_c:"Jul 2, 2026",valor_c:324.98,valor_hoy:319.14,var_pct:-1.80},
   ],
   ali:[
     {ticker:"SPY",broker:"Santander",fecha_c:"Dec 30, 2025",valor_c:34.22,valor_hoy:36.82,var_pct:7.61},
-    {ticker:"SPY",broker:"Santander",fecha_c:"Jan 2, 2026", valor_c:101.00,valor_hoy:110.47,var_pct:9.37},
+    {ticker:"SPY",broker:"Santander",fecha_c:"Jan 2, 2026",valor_c:101.00,valor_hoy:110.47,var_pct:9.37},
     {ticker:"SPY",broker:"Santander",fecha_c:"Jan 26, 2026",valor_c:67.05,valor_hoy:73.65,var_pct:9.84},
     {ticker:"SPY",broker:"Santander",fecha_c:"Mar 27, 2026",valor_c:59.48,valor_hoy:73.78,var_pct:24.04},
   ],
   cartera:[
     {ticker:"META",valor_c:187.40,valor_act:169.79,var_pct:-9.40,proporcion:9.93},
-    {ticker:"SPY", valor_c:856.47,valor_act:908.78,var_pct:6.11, proporcion:53.13},
-    {ticker:"AAPL",valor_c:41.01, valor_act:45.90, var_pct:11.95,proporcion:2.68},
-    {ticker:"XLK", valor_c:213.70,valor_act:268.59,var_pct:25.69,proporcion:15.70},
-    {ticker:"QQQ", valor_c:276.66,valor_act:317.41,var_pct:14.73,proporcion:18.56},
+    {ticker:"SPY",valor_c:856.47,valor_act:908.78,var_pct:6.11,proporcion:53.13},
+    {ticker:"AAPL",valor_c:41.01,valor_act:45.90,var_pct:11.95,proporcion:2.68},
+    {ticker:"XLK",valor_c:213.70,valor_act:268.59,var_pct:25.69,proporcion:15.70},
+    {ticker:"QQQ",valor_c:276.66,valor_act:317.41,var_pct:14.73,proporcion:18.56},
   ],
   resto:[
-    {fecha:"1-oct-2025", cat:"FCI USD",broker:"Ualá",    activo:"USD", valor_c:1285.82,valor_a:1473.31,pl:187.49,pl_pct:14.58,pl_ok:true},
-    {fecha:"30-dic-2025",cat:"FCI USD",broker:"Santander",activo:"USD",valor_c:2068.27,valor_a:2072.36,pl:4.09,  pl_pct:0.20, pl_ok:true},
-    {fecha:"26-ene-2026",cat:"Bitcoin",broker:"Nexo",activo:"BTC", valor_c:48.97,valor_a:28.13,pl:-20.84,pl_pct:-42.56,pl_ok:true},
-    {fecha:"26-ene-2026",cat:"ETF",    broker:"Nexo",activo:"SPY", valor_c:375.94,valor_a:385.30,pl:9.36,pl_pct:2.49,pl_ok:true},
-    {fecha:"26-ene-2026",cat:"ETF",    broker:"Nexo",activo:"XLV", valor_c:89.66,valor_a:90.66,pl:1.00,pl_pct:1.12,pl_ok:true},
-    {fecha:"26-ene-2026",cat:"ETF",    broker:"Nexo",activo:"XLE", valor_c:150.42,valor_a:146.46,pl:-3.96,pl_pct:-2.63,pl_ok:true},
-    {fecha:"26-ene-2026",cat:"ETF",    broker:"Nexo",activo:"SPYG",valor_c:72.81,valor_a:79.83,pl:7.02,pl_pct:9.64,pl_ok:true},
-    {fecha:"27-mar-2026",cat:"ETF",    broker:"Nexo",activo:"MSFT",valor_c:89.00,valor_a:90.48,pl:1.48,pl_pct:1.66,pl_ok:true},
-    {fecha:"27-mar-2026",cat:"USDT",   broker:"Nexo",activo:"USDT",valor_c:845.00,valor_a:850.94,pl:5.94,pl_pct:0.70,pl_ok:true},
-    {fecha:"1-jul-2026", cat:"USDT",   broker:"Nexo",activo:"USDT",valor_c:318.14,valor_a:318.14,pl:0,pl_pct:0,pl_ok:true},
-    {fecha:"27-mar-2026",cat:"MELI",   broker:"Nexo",activo:"MELI",valor_c:158.03,valor_a:162.75,pl:4.72,pl_pct:2.99,pl_ok:true},
+    {fecha:"1-oct-2025",cat:"FCI USD",broker:"Ualá",activo:"USD",valor_c:1285.82,valor_a:1473.31,pl:187.49,pl_pct:14.58,pl_ok:true},
+    {fecha:"30-dic-2025",cat:"FCI USD",broker:"Santander",activo:"USD",valor_c:2068.27,valor_a:2072.36,pl:4.09,pl_pct:0.20,pl_ok:true},
+    {fecha:"26-ene-2026",cat:"Bitcoin",broker:"Nexo",activo:"BTC",valor_c:48.97,valor_a:28.13,pl:-20.84,pl_pct:-42.56,pl_ok:true},
+    {fecha:"26-ene-2026",cat:"ETF",broker:"Nexo",activo:"SPY",valor_c:375.94,valor_a:385.30,pl:9.36,pl_pct:2.49,pl_ok:true},
+    {fecha:"26-ene-2026",cat:"ETF",broker:"Nexo",activo:"XLV",valor_c:89.66,valor_a:90.66,pl:1.00,pl_pct:1.12,pl_ok:true},
+    {fecha:"26-ene-2026",cat:"ETF",broker:"Nexo",activo:"XLE",valor_c:150.42,valor_a:146.46,pl:-3.96,pl_pct:-2.63,pl_ok:true},
+    {fecha:"26-ene-2026",cat:"ETF",broker:"Nexo",activo:"SPYG",valor_c:72.81,valor_a:79.83,pl:7.02,pl_pct:9.64,pl_ok:true},
+    {fecha:"27-mar-2026",cat:"ETF",broker:"Nexo",activo:"MSFT",valor_c:89.00,valor_a:90.48,pl:1.48,pl_pct:1.66,pl_ok:true},
+    {fecha:"27-mar-2026",cat:"USDT",broker:"Nexo",activo:"USDT",valor_c:845.00,valor_a:850.94,pl:5.94,pl_pct:0.70,pl_ok:true},
+    {fecha:"1-jul-2026",cat:"USDT",broker:"Nexo",activo:"USDT",valor_c:318.14,valor_a:318.14,pl:0,pl_pct:0,pl_ok:true},
+    {fecha:"27-mar-2026",cat:"MELI",broker:"Nexo",activo:"MELI",valor_c:158.03,valor_a:162.75,pl:4.72,pl_pct:2.99,pl_ok:true},
   ],
   ars:[
     {fecha:"2-ene-2026",cat:"Acción",broker:"Santander",activo:"YPFD",cant:3,valor_c:166350,valor_a:211800,pl:45450,pl_pct:21.46},
   ],
 };
+let STATE={...FALLBACK,source:'empty'};
 
-let STATE = { ...FALLBACK, source:'empty' };
-
-// ════════════════════════════════════════════════════════
-//  LOAD
-// ════════════════════════════════════════════════════════
-async function loadAll() {
+async function loadAll(){
   setStatus('cargando...','warn');
   document.getElementById('tab-portfolio').innerHTML='<div class="loading"><div class="spin">⟳</div><br>Actualizando...</div>';
-  try {
+  try{
     const [csvCed,csvResto,csvArs]=await Promise.all([fetchSheet('cedears'),fetchSheet('resto'),fetchSheet('ars')]);
     const ced=parseCedears(csvCed);
     STATE={mine:ced.mine,ali:ced.ali,cartera:ced.cartera,totales:ced.totales,resto:parseResto(csvResto),ars:parseArs(csvArs),source:'live'};
     setStatus('en vivo','live');
     document.getElementById('sync-time').textContent='actualizado '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
-  } catch(e) {
+  }catch(e){
     STATE={...FALLBACK,source:'fallback'};
     setStatus('datos del 2 jul','err');
   }
   renderAll();
 }
-
-function setStatus(txt,type) {
+function setStatus(txt,type){
   const el=document.getElementById('sync-status');
   el.className=`chip chip-${type==='live'?'live':type==='err'?'err':'warn'}`;
   el.innerHTML=`<span class="dot ${type==='live'?'dot-g':type==='err'?'dot-r':'dot-o'}"></span>${txt}`;
 }
-
-function renderAll() {
+function renderAll(){
   renderPortfolio();
-  if(activeTab==='evolucion') renderEvolucion();
-  if(activeTab==='analisis')  renderAnalisis();
-  if(activeTab==='alertas')   renderAlertas();
-  if(activeTab==='casa')      renderCasa();
+  if(activeTab==='evolucion')renderEvolucion();
+  if(activeTab==='analisis')renderAnalisis();
+  if(activeTab==='alertas')renderAlertas();
+  if(activeTab==='casa')renderCasa();
 }
 
-// ════════════════════════════════════════════════════════
-//  UTILS
-// ════════════════════════════════════════════════════════
-function usd(n,d=2){if(n==null)return'—';const a=Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});return(n<0?'-':'')+'U$D '+a;}
+// ════════ UTILS ════════
+function usd(n,d=2){
+  if(n==null)return'—';
+  if(PRIVACY)return'U$D •••';
+  const a=Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+  return(n<0?'-':'')+'U$D '+a;
+}
+function arsFmt(n){
+  if(n==null)return'—';
+  if(PRIVACY)return'$ •••';
+  return'$ '+n.toLocaleString('es-AR',{maximumFractionDigits:0});
+}
 function pct(n){if(n==null)return'—';return(n>=0?'+':'')+n.toFixed(2)+'%';}
 function pc(n){return n==null?'':n>=0?'pos':'neg';}
 function s(arr,k){return arr.reduce((t,o)=>t+(o[k]||0),0);}
+function parseDate(str){
+  if(!str)return null;
+  const months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11,ene:0,feb:1,mar:2,abr:3,may:4,jun:5,jul:6,ago:7,sep:8,oct:9,nov:10,dic:11};
+  let m=str.match(/(\w+)\s+(\d+),\s*(\d+)/);
+  if(m)return new Date(+m[3],months[m[1]]??0,+m[2]);
+  m=str.match(/(\d+)-(\w+)-(\d+)/);
+  if(m)return new Date(+m[3],months[m[2].toLowerCase()]??0,+m[1]);
+  return null;
+}
+function daysHeld(fechaStr){
+  const d=parseDate(fechaStr);
+  if(!d)return null;
+  return Math.max(1,Math.round((new Date()-d)/(1000*60*60*24)));
+}
+function cagr(vc,va,days){
+  if(!vc||!va||!days||vc<=0)return null;
+  const total=va/vc;
+  if(total<=0)return null;
+  return(Math.pow(total,365/days)-1)*100;
+}
 
-// ════════════════════════════════════════════════════════
-//  TAB 1: PORTFOLIO
-// ════════════════════════════════════════════════════════
-function renderPortfolio() {
+// Capa de riesgo por activo
+function riskLayer(activo,cat){
+  const c=(cat||'').toUpperCase(),a=(activo||'').toUpperCase();
+  if(c.includes('FCI')||a==='USDT'||a==='USD')return'estable';
+  if(a==='BTC'||['META','AAPL','MSFT','MELI'].includes(a))return'volatil';
+  return'mercado'; // ETFs amplios: SPY QQQ SPYG XLK XLV XLE
+}
+
+// ════════ TAB 1: PORTFOLIO ════════
+function renderPortfolio(){
   const {mine,ali,cartera,resto,ars}=STATE;
   const mTC=s(mine,'valor_c'),mTA=s(mine,'valor_hoy');
-  const aTC=s(ali,'valor_c'), aTA=s(ali,'valor_hoy');
-  const cedTC=mTC+aTC, cedTA=mTA+aTA;
+  const aTC=s(ali,'valor_c'),aTA=s(ali,'valor_hoy');
+  const cedTC=mTC+aTC,cedTA=mTA+aTA;
   const resTC=s(resto,'valor_c'),resTA=s(resto,'valor_a');
-  const granTC=cedTC+resTC, granTA=cedTA+resTA;
-  const arsArr=ars||[], arsTC=s(arsArr,'valor_c'), arsTA=s(arsArr,'valor_a');
+  const granTC=cedTC+resTC,granTA=cedTA+resTA;
+  const arsArr=ars||[],arsTC=s(arsArr,'valor_c'),arsTA=s(arsArr,'valor_a');
   const COLORS={IOL:'#00c896',Santander:'#ff6b4a',Nexo:'#3d8fff','Ualá':'#f0b429'};
 
-  // KPIs
   const kpis=`<div class="kpi-row">
     <div class="kpi b"><div class="kl">Total portfolio</div><div class="kv">${usd(granTA,0)}</div><div class="ks ${pc(granTA-granTC)}">${usd(granTA-granTC)} · ${pct((granTA-granTC)/granTC*100)}</div></div>
     <div class="kpi g"><div class="kl">CEDEARs</div><div class="kv">${usd(cedTA,0)}</div><div class="ks ${pc(cedTA-cedTC)}">${usd(cedTA-cedTC)} · ${pct((cedTA-cedTC)/cedTC*100)}</div></div>
     <div class="kpi o"><div class="kl">Nexo · Ualá · FCI</div><div class="kv">${usd(resTA,0)}</div><div class="ks muted">valor actual</div></div>
     <div class="kpi p"><div class="kl">Ali 👶🏻</div><div class="kv" style="color:var(--ali)">${usd(aTA,0)}</div><div class="ks ${pc(aTA-aTC)}">${usd(aTA-aTC)} · ${pct((aTA-aTC)/aTC*100)}</div></div>
-    ${arsArr.length>0?`<div class="kpi" style="border-color:rgba(240,180,41,.3)"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold)"></div><div class="kl">Acciones ARS 🇦🇷</div><div class="kv" style="color:var(--gold);font-size:16px">$ ${arsTA.toLocaleString('es-AR',{maximumFractionDigits:0})}</div><div class="ks ${pc(arsTA-arsTC)}">${pct((arsTA-arsTC)/arsTC*100)} · en pesos</div></div>`:''}
+    ${arsArr.length>0?`<div class="kpi" style="border-color:rgba(240,180,41,.3)"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold)"></div><div class="kl">Acciones ARS 🇦🇷</div><div class="kv" style="color:var(--gold);font-size:16px">${arsFmt(arsTA)}</div><div class="ks ${pc(arsTA-arsTC)}">${pct((arsTA-arsTC)/arsTC*100)} · en pesos</div></div>`:''}
   </div>`;
 
-  // Donut
   const segs=[
     {label:'CEDEARs · yo',val:mTA,color:'#00c896'},
     {label:'CEDEARs · Ali',val:aTA,color:'#c084fc'},
@@ -396,12 +423,11 @@ function renderPortfolio() {
   const barsH=bArr.map(([b,v])=>`<div class="bar-row"><span class="bar-lbl">${b}</span><div class="bar-track"><div class="bar-fill" style="width:${v/maxB*100}%;background:${COLORS[b]||'#6b7f96'}"></div><span class="bar-val">${usd(v,0)}</span></div><span class="bar-pct muted">${pct(v/granTA*100)}</span></div>`).join('');
   const overview=`<div class="g2">
     <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Distribución</span><span class="badge bb">${usd(granTA,0)}</span></div>
-      <div class="dw"><svg width="90" height="90" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="var(--border)" stroke-width="13"/>${svgS}<text x="50" y="47" text-anchor="middle" font-family="IBM Plex Mono" font-size="7" fill="var(--text)">TOTAL</text><text x="50" y="57" text-anchor="middle" font-family="IBM Plex Mono" font-size="6" fill="var(--dim)">${usd(granTA,0)}</text></svg><div class="leg">${legH}</div></div>
+      <div class="dw"><svg width="90" height="90" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="var(--border)" stroke-width="13"/>${svgS}<text x="50" y="47" text-anchor="middle" font-family="IBM Plex Mono" font-size="7" fill="var(--text)">TOTAL</text><text x="50" y="57" text-anchor="middle" font-family="IBM Plex Mono" font-size="6" fill="var(--dim)">${PRIVACY?'•••':usd(granTA,0)}</text></svg><div class="leg">${legH}</div></div>
     </div>
     <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Por broker</span></div><div class="cb">${barsH}</div></div>
   </div>`;
 
-  // Heatmap
   const heatH=cartera.map(c=>{
     const p=c.var_pct||0,ab=Math.min(Math.abs(p)/25,1);
     const bg=p>=0?`rgba(0,${Math.round(60+ab*140)},80,${.15+ab*.35})`:`rgba(${Math.round(100+ab*155)},30,30,${.15+ab*.35})`;
@@ -418,7 +444,7 @@ function renderPortfolio() {
 
   const cedSec=`
     <div class="sec"><span class="sec-lbl" style="color:var(--accent)">▸ CEDEARs</span><div class="sec-line" style="background:linear-gradient(to right,rgba(0,200,150,.4),transparent)"></div><span class="sec-tag" style="background:rgba(0,200,150,.1);color:var(--accent);border:1px solid rgba(0,200,150,.2)">${usd(cedTA,0)} · ${pct((cedTA-cedTC)/cedTC*100)}</span></div>
-    <div class="card"><div class="ch"><span class="ct">Heatmap por ticker</span><span class="badge bb">P&L exacto por lote</span></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;padding:14px 16px">${heatH}</div></div>
+    <div class="card"><div class="ch"><span class="ct">Heatmap por ticker</span><span class="badge bb">P&L por ticker</span></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;padding:14px 16px">${heatH}</div></div>
     <div class="g2">
       <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Mis lotes</span><span class="badge bg">${usd(mTA,0)} · <span class="${pc(mPL)}">${pct(mPL/mTC*100)}</span></span></div>
         <div style="padding:0 14px 12px;overflow-x:auto"><table><thead><tr><th>Ticker</th><th>Broker</th><th class="r">Fecha</th><th class="r">Compra</th><th class="r">Actual</th><th class="r">Var</th></tr></thead><tbody>${rowsMine}</tbody>
@@ -443,7 +469,7 @@ function renderPortfolio() {
 
   const restoSec=`
     <div class="sec"><span class="sec-lbl" style="color:var(--blue)">▸ Nexo · Ualá · Santander FCI</span><div class="sec-line" style="background:linear-gradient(to right,rgba(61,143,255,.4),transparent)"></div><span class="sec-tag" style="background:rgba(61,143,255,.1);color:var(--blue);border:1px solid rgba(61,143,255,.2)">${usd(resTA,0)} actual</span></div>
-    ${noOk>0?`<div class="notice">⚠️ ${noOk} posiciones sin P&L histórico — precio de entrada no disponible.</div>`:''}
+    ${noOk>0?`<div class="notice">⚠️ ${noOk} posiciones sin P&L histórico.</div>`:''}
     <div class="g2">
       <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Posiciones</span><span class="badge bb">${resto.length} activos</span></div>
         <div style="padding:0 14px 12px;overflow-x:auto"><table><thead><tr><th>Activo</th><th>Broker</th><th>Tipo</th><th class="r">Fecha</th><th class="r">Compra</th><th class="r">Actual</th><th class="r">P&L</th></tr></thead><tbody>${rowsResto}</tbody>
@@ -454,390 +480,389 @@ function renderPortfolio() {
 
   const arsSec=arsArr.length===0?'':(`
     <div class="sec"><span class="sec-lbl" style="color:var(--gold)">▸ Acciones ARS 🇦🇷</span><div class="sec-line" style="background:linear-gradient(to right,rgba(240,180,41,.4),transparent)"></div><span class="sec-tag" style="background:rgba(240,180,41,.1);color:var(--gold);border:1px solid rgba(240,180,41,.2)">en pesos argentinos</span></div>
-    <div class="notice">🇦🇷 Posiciones en <strong>pesos argentinos (ARS)</strong> — no se suman al total USD del portfolio.</div>
+    <div class="notice">🇦🇷 Posiciones en <strong>pesos argentinos (ARS)</strong> — no se suman al total USD.</div>
     <div class="card"><div class="ch"><span class="ct">Posiciones en ARS</span><span class="badge bo">${arsArr.length} activo${arsArr.length>1?'s':''}</span></div>
       <div style="padding:0 14px 12px;overflow-x:auto"><table><thead><tr><th>Activo</th><th>Broker</th><th>Tipo</th><th class="r">Fecha</th><th class="r">Cant</th><th class="r">Compra ARS</th><th class="r">Actual ARS</th><th class="r">P&L</th></tr></thead>
-      <tbody>${arsArr.map(r=>`<tr><td><span class="tk">${r.activo}</span></td><td><span class="tag">${r.broker}</span></td><td><span class="tag">${r.cat}</span></td><td class="r" style="color:var(--dim);font-size:10px">${r.fecha}</td><td class="r">${r.cant}</td><td class="r">$ ${r.valor_c.toLocaleString('es-AR',{maximumFractionDigits:0})}</td><td class="r">$ ${r.valor_a.toLocaleString('es-AR',{maximumFractionDigits:0})}</td><td class="r"><span class="badge ${r.pl>=0?'bg':'br'}">${r.pl_pct!=null?pct(r.pl_pct):'—'}</span></td></tr>`).join('')}</tbody>
-      <tfoot><tr style="border-top:1px solid var(--border)"><td colspan="5" class="muted" style="padding-top:8px">Total ARS</td><td class="r muted" style="padding-top:8px">$ ${arsTC.toLocaleString('es-AR',{maximumFractionDigits:0})}</td><td class="r" style="padding-top:8px">$ ${arsTA.toLocaleString('es-AR',{maximumFractionDigits:0})}</td><td class="r ${pc(arsTA-arsTC)}" style="padding-top:8px">${pct((arsTA-arsTC)/arsTC*100)}</td></tr></tfoot></table></div>
+      <tbody>${arsArr.map(r=>`<tr><td><span class="tk">${r.activo}</span></td><td><span class="tag">${r.broker}</span></td><td><span class="tag">${r.cat}</span></td><td class="r" style="color:var(--dim);font-size:10px">${r.fecha}</td><td class="r">${r.cant}</td><td class="r">${arsFmt(r.valor_c)}</td><td class="r">${arsFmt(r.valor_a)}</td><td class="r"><span class="badge ${r.pl>=0?'bg':'br'}">${r.pl_pct!=null?pct(r.pl_pct):'—'}</span></td></tr>`).join('')}</tbody>
+      <tfoot><tr style="border-top:1px solid var(--border)"><td colspan="5" class="muted" style="padding-top:8px">Total ARS</td><td class="r muted" style="padding-top:8px">${arsFmt(arsTC)}</td><td class="r" style="padding-top:8px">${arsFmt(arsTA)}</td><td class="r ${pc(arsTA-arsTC)}" style="padding-top:8px">${pct((arsTA-arsTC)/arsTC*100)}</td></tr></tfoot></table></div>
     </div>`);
 
-  document.getElementById('tab-portfolio').innerHTML = kpis+overview+cedSec+restoSec+arsSec;
+  document.getElementById('tab-portfolio').innerHTML=kpis+overview+cedSec+restoSec+arsSec;
 }
 
-// ════════════════════════════════════════════════════════
-//  TAB 2: EVOLUCIÓN
-// ════════════════════════════════════════════════════════
-function renderEvolucion() {
-  // Construir timeline de capital invertido desde fechas de compra
+// ════════ TAB 2: EVOLUCIÓN ════════
+function renderEvolucion(){
   const {mine,ali,resto}=STATE;
   const allLotes=[...mine,...ali,...resto.filter(r=>r.valor_c>0)];
+  const events=allLotes.map(l=>({date:parseDate(l.fecha_c||l.fecha),val:l.valor_c||0})).filter(e=>e.date&&e.val>0).sort((a,b)=>a.date-b.date);
+  if(!events.length){document.getElementById('tab-evolucion').innerHTML='<div class="loading">Sin datos.</div>';return;}
 
-  // Parsear fechas
-  const parseDate=str=>{
-    if(!str)return null;
-    const months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11,
-      ene:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,ago:7,sep:8,oct:9,nov:10,dic:11};
-    // "Nov 27, 2025"
-    let m=str.match(/(\w+)\s+(\d+),\s*(\d+)/);
-    if(m)return new Date(+m[3],months[m[1]]||0,+m[2]);
-    // "1-oct-2025"
-    m=str.match(/(\d+)-(\w+)-(\d+)/);
-    if(m)return new Date(+m[3],months[m[2].toLowerCase()]||0,+m[1]);
-    // "26-ene-2026"
-    return null;
-  };
-
-  const events=allLotes.map(l=>({date:parseDate(l.fecha_c||l.fecha),val:l.valor_c||0}))
-    .filter(e=>e.date&&e.val>0)
-    .sort((a,b)=>a.date-b.date);
-
-  if(!events.length){
-    document.getElementById('tab-evolucion').innerHTML='<div class="loading">Sin datos de fechas.</div>';
-    return;
-  }
-
-  // Generar puntos mensuales
   const start=new Date(events[0].date);start.setDate(1);
   const end=new Date();end.setDate(1);
   const months=[],invested=[],cumInvested=[];
   let cum=0;
   for(let d=new Date(start);d<=end;d.setMonth(d.getMonth()+1)){
-    const label=d.toLocaleDateString('es-AR',{month:'short',year:'2-digit'});
-    months.push(label);
+    months.push(d.toLocaleDateString('es-AR',{month:'short',year:'2-digit'}));
     const monthEnd=new Date(d.getFullYear(),d.getMonth()+1,0);
     const added=events.filter(e=>e.date>=d&&e.date<=monthEnd).reduce((s,e)=>s+e.val,0);
-    cum+=added;
-    invested.push(added);
-    cumInvested.push(+cum.toFixed(2));
+    cum+=added;invested.push(added);cumInvested.push(+cum.toFixed(2));
   }
-
-  // Valor actual aproximado por mes (lineal desde compra al valor actual)
   const totalC=allLotes.reduce((s,l)=>s+(l.valor_c||0),0);
   const totalA=allLotes.reduce((s,l)=>s+(l.valor_hoy||l.valor_a||0),0);
   const growth=totalC>0?totalA/totalC:1;
-  const valorEstimado=cumInvested.map((c,i)=>{
-    const progress=i/(cumInvested.length-1||1);
-    return +((c*(1+(growth-1)*progress)).toFixed(2));
-  });
+  const valorEstimado=cumInvested.map((c,i)=>{const p=i/(cumInvested.length-1||1);return +((c*(1+(growth-1)*p)).toFixed(2));});
 
   const html=`
     <div class="kpi-row">
       <div class="kpi b"><div class="kl">Capital invertido</div><div class="kv">${usd(totalC,0)}</div><div class="ks muted">desde Nov 2025</div></div>
       <div class="kpi g"><div class="kl">Valor actual</div><div class="kv">${usd(totalA,0)}</div><div class="ks pos">+${usd(totalA-totalC,0)}</div></div>
       <div class="kpi o"><div class="kl">Rendimiento total</div><div class="kv">${pct((totalA-totalC)/totalC*100)}</div><div class="ks muted">desde inicio</div></div>
-      <div class="kpi p"><div class="kl">Tiempo invertido</div><div class="kv" style="font-size:16px">${Math.round((new Date()-new Date(events[0].date))/(1000*60*60*24*30))} meses</div><div class="ks muted">primer lote Nov 2025</div></div>
+      <div class="kpi p"><div class="kl">Tiempo invertido</div><div class="kv" style="font-size:16px">${Math.round((new Date()-events[0].date)/(1000*60*60*24*30))} meses</div><div class="ks muted">primer lote Nov 2025</div></div>
     </div>
-    <div class="card"><div class="ch"><span class="ct">Capital invertido vs valor estimado</span><span class="badge bb">desde inicio</span></div>
-      <div style="padding:16px;height:280px"><canvas id="chartEvolucion"></canvas></div>
-    </div>
+    <div class="card"><div class="ch"><span class="ct">Capital invertido vs valor estimado</span></div><div style="padding:16px;height:280px"><canvas id="chartEvolucion"></canvas></div></div>
     <div class="g2">
-      <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Compras por mes</span></div>
-        <div style="padding:16px;height:200px"><canvas id="chartCompras"></canvas></div>
-      </div>
-      <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Proyección Ali 👶🏻 · SPY ~10% anual</span></div>
-        <div style="padding:14px 16px" id="projAli"></div>
-      </div>
+      <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Compras por mes</span></div><div style="padding:16px;height:200px"><canvas id="chartCompras"></canvas></div></div>
+      <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Proyección Ali 👶🏻</span></div><div style="padding:14px 16px" id="projAli"></div></div>
     </div>`;
-
   document.getElementById('tab-evolucion').innerHTML=html;
 
-  // Chart evolución
   setTimeout(()=>{
+    const yTicks=PRIVACY?{display:false}:{color:'#6b7f96',font:{size:9},callback:v=>'U$D '+v.toLocaleString()};
     const ctx1=document.getElementById('chartEvolucion');
-    if(ctx1&&window.Chart){
-      new Chart(ctx1,{type:'line',data:{labels:months,datasets:[
-        {label:'Capital invertido',data:cumInvested,borderColor:'#3d8fff',backgroundColor:'rgba(61,143,255,.08)',fill:true,tension:.3,pointRadius:2},
-        {label:'Valor estimado',data:valorEstimado,borderColor:'#00c896',backgroundColor:'rgba(0,200,150,.08)',fill:true,tension:.3,pointRadius:2},
-      ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#6b7f96',font:{family:'IBM Plex Mono',size:10}}}},scales:{x:{ticks:{color:'#6b7f96',font:{size:9}},grid:{color:'#1e2a3a'}},y:{ticks:{color:'#6b7f96',font:{size:9},callback:v=>'U$D '+v.toLocaleString()},grid:{color:'#1e2a3a'}}}}});
-    }
+    if(ctx1&&window.Chart)new Chart(ctx1,{type:'line',data:{labels:months,datasets:[
+      {label:'Capital invertido',data:cumInvested,borderColor:'#3d8fff',backgroundColor:'rgba(61,143,255,.08)',fill:true,tension:.3,pointRadius:2},
+      {label:'Valor estimado',data:valorEstimado,borderColor:'#00c896',backgroundColor:'rgba(0,200,150,.08)',fill:true,tension:.3,pointRadius:2},
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#6b7f96',font:{family:'IBM Plex Mono',size:10}}},tooltip:{enabled:!PRIVACY}},scales:{x:{ticks:{color:'#6b7f96',font:{size:9}},grid:{color:'#1e2a3a'}},y:{ticks:yTicks,grid:{color:'#1e2a3a'}}}}});
     const ctx2=document.getElementById('chartCompras');
-    if(ctx2&&window.Chart){
-      new Chart(ctx2,{type:'bar',data:{labels:months,datasets:[{label:'Invertido',data:invested,backgroundColor:'rgba(61,143,255,.5)',borderColor:'#3d8fff',borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#6b7f96',font:{size:9}},grid:{color:'#1e2a3a'}},y:{ticks:{color:'#6b7f96',font:{size:9},callback:v=>'$'+v},grid:{color:'#1e2a3a'}}}}});
-    }
-
-    // Proyección Ali
+    if(ctx2&&window.Chart)new Chart(ctx2,{type:'bar',data:{labels:months,datasets:[{data:invested,backgroundColor:'rgba(61,143,255,.5)',borderColor:'#3d8fff',borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:!PRIVACY}},scales:{x:{ticks:{color:'#6b7f96',font:{size:9}},grid:{color:'#1e2a3a'}},y:{ticks:PRIVACY?{display:false}:{color:'#6b7f96',font:{size:9},callback:v=>'$'+v},grid:{color:'#1e2a3a'}}}}});
     const aliTotal=s(STATE.ali,'valor_hoy');
-    const rates=[0.07,0.10,0.12];
-    const years=[1,2,3,5,10];
-    const projHTML=`<div style="margin-bottom:8px;font-family:var(--mono);font-size:9px;color:var(--dim)">Tasa histórica SPY: ~10% anual. Capital actual Ali: ${usd(aliTotal)}</div>
-    <div style="overflow-x:auto"><table><thead><tr><th>Año</th><th class="r">7% (conserv.)</th><th class="r">10% (histórico)</th><th class="r">12% (optimista)</th></tr></thead><tbody>
-    ${years.map(y=>`<tr><td style="color:var(--ali)">+${y} año${y>1?'s':''}</td>${rates.map(r=>`<td class="r" style="color:var(--accent)">${usd(aliTotal*Math.pow(1+r,y),0)}</td>`).join('')}</tr>`).join('')}
-    </tbody></table></div>`;
     const el=document.getElementById('projAli');
-    if(el)el.innerHTML=projHTML;
+    if(el)el.innerHTML=`<div style="margin-bottom:8px;font-family:var(--mono);font-size:9px;color:var(--dim)">Tasa histórica SPY ~10% anual. Capital actual Ali: ${usd(aliTotal)}</div>
+    <div style="overflow-x:auto"><table><thead><tr><th>Año</th><th class="r">7%</th><th class="r">10%</th><th class="r">12%</th></tr></thead><tbody>
+    ${[1,2,3,5,10].map(y=>`<tr><td style="color:var(--ali)">+${y}</td>${[0.07,0.10,0.12].map(r=>`<td class="r" style="color:var(--accent)">${usd(aliTotal*Math.pow(1+r,y),0)}</td>`).join('')}</tr>`).join('')}
+    </tbody></table></div>`;
   },100);
 }
 
-// ════════════════════════════════════════════════════════
-//  TAB 3: ANÁLISIS
-// ════════════════════════════════════════════════════════
-function renderAnalisis() {
-  const {mine,ali,cartera,resto}=STATE;
+// ════════ TAB 3: ANÁLISIS ════════
+function renderAnalisis(){
+  const {mine,ali,resto}=STATE;
   const allUSD=[...mine,...ali];
   const granTA=s(allUSD,'valor_hoy')+s(resto,'valor_a');
 
-  // Exposición por sector (abriendo ETFs)
-  // Pesos aproximados de composición de ETFs relevantes
+  // ── Waterfall P&L por activo ──
+  const plMap={};
+  allUSD.forEach(o=>{const k=o.ticker;if(!plMap[k])plMap[k]=0;plMap[k]+=(o.valor_hoy||0)-(o.valor_c||0);});
+  resto.forEach(r=>{if(!r.pl_ok)return;const k=r.activo;if(!plMap[k])plMap[k]=0;plMap[k]+=r.pl||0;});
+  const plArr=Object.entries(plMap).sort((a,b)=>b[1]-a[1]);
+
+  // ── CAGR + vs SPY por lote ──
+  // referencia SPY: mapa fecha→retorno usando los lotes SPY propios
+  const spyLotes=[...allUSD.filter(o=>o.ticker==='SPY'),...resto.filter(r=>r.activo==='SPY')].map(l=>({
+    date:parseDate(l.fecha_c||l.fecha), ret:l.var_pct!=null?l.var_pct:(l.pl_pct!=null?l.pl_pct:null)
+  })).filter(x=>x.date&&x.ret!=null);
+  const spyRetAt=date=>{
+    if(!spyLotes.length||!date)return null;
+    let best=null,bd=Infinity;
+    spyLotes.forEach(sl=>{const d=Math.abs(sl.date-date);if(d<bd){bd=d;best=sl.ret;}});
+    return bd<1000*60*60*24*45?best:null; // solo si hay ref a <45 días
+  };
+
+  const lotesAnalisis=allUSD.map(o=>{
+    const days=daysHeld(o.fecha_c);
+    const c=cagr(o.valor_c,o.valor_hoy,days);
+    const spyRef=spyRetAt(parseDate(o.fecha_c));
+    const vsSpy=(o.var_pct!=null&&spyRef!=null)?o.var_pct-spyRef:null;
+    return{...o,days,cagr:c,vsSpy};
+  }).filter(l=>l.days!=null);
+
+  const rowsCagr=lotesAnalisis.map(l=>{
+    const cagrCell=l.cagr==null?'—':`<span class="${pc(l.cagr)}">${pct(l.cagr)}</span>`;
+    const vsCell=l.vsSpy==null?'<span class="muted">—</span>':(l.ticker==='SPY'?'<span class="muted">ref</span>':`<span class="badge ${l.vsSpy>=0?'bg':'br'}">${pct(l.vsSpy)}</span>`);
+    return`<tr><td><span class="tk">${l.ticker}</span></td><td><span class="tag">${l.broker}</span></td><td class="r muted" style="font-size:10px">${l.days}d</td><td class="r">${pct(l.var_pct)}</td><td class="r">${cagrCell}</td><td class="r">${vsCell}</td></tr>`;
+  }).join('');
+
+  // vs SPY resumen
+  const beatSpy=lotesAnalisis.filter(l=>l.vsSpy!=null&&l.ticker!=='SPY'&&l.vsSpy>0).length;
+  const loseSpy=lotesAnalisis.filter(l=>l.vsSpy!=null&&l.ticker!=='SPY'&&l.vsSpy<0).length;
+
+  // ── Break-even para perdedores ──
+  const losers=[
+    ...allUSD.filter(o=>o.var_pct!=null&&o.var_pct<0).map(o=>({name:o.ticker+' ('+o.broker+')',pctDown:o.var_pct,vc:o.valor_c,va:o.valor_hoy})),
+    ...resto.filter(r=>r.pl_ok&&r.pl_pct!=null&&r.pl_pct<0).map(r=>({name:r.activo+' (Nexo)',pctDown:r.pl_pct,vc:r.valor_c,va:r.valor_a})),
+  ];
+  const rowsBE=losers.map(l=>{
+    const needed=(l.vc/l.va-1)*100;
+    return`<tr><td><span class="tk">${l.name}</span></td><td class="r neg">${pct(l.pctDown)}</td><td class="r" style="color:var(--gold);font-weight:600">+${needed.toFixed(1)}%</td><td class="r muted">${usd(l.vc-l.va)}</td></tr>`;
+  }).join('');
+
+  // ── Sectores (igual que antes) ──
   const SECTOR_ETF={
-    SPY: {Tech:31,Health:12,Finance:13,Consumer:10,Industrial:8,Energy:4,Other:22},
-    QQQ: {Tech:58,Health:6,Consumer:18,Finance:5,Industrial:3,Other:10},
-    XLK: {Tech:100},
-    SPYG:{Tech:45,Health:8,Consumer:20,Finance:8,Industrial:5,Other:14},
-    META:{Tech:100},
-    AAPL:{Tech:100},
-    MSFT:{Tech:100},
-    MELI:{Tech:100},
-    XLV: {Health:100},
-    XLE: {Energy:100},
-    BTC: {Crypto:100},
-    USDT:{Cash:100},
+    SPY:{Tech:31,Health:12,Finance:13,Consumer:10,Industrial:8,Energy:4,Other:22},
+    QQQ:{Tech:58,Health:6,Consumer:18,Finance:5,Industrial:3,Other:10},
+    XLK:{Tech:100},SPYG:{Tech:45,Health:8,Consumer:20,Finance:8,Industrial:5,Other:14},
+    META:{Tech:100},AAPL:{Tech:100},MSFT:{Tech:100},MELI:{Tech:100},
+    XLV:{Health:100},XLE:{Energy:100},BTC:{Crypto:100},USDT:{Cash:100},USD:{Cash:100},
   };
-  const SECTOR_COLORS={Tech:'#3d8fff',Health:'#00c896',Finance:'#f0b429',Consumer:'#c084fc',Industrial:'#6b7f96',Energy:'#ff6b4a',Other:'#2a3a4a',Crypto:'#f7931a',Cash:'#1e2a3a'};
-
+  const SECTOR_COLORS={Tech:'#3d8fff',Health:'#00c896',Finance:'#f0b429',Consumer:'#c084fc',Industrial:'#6b7f96',Energy:'#ff6b4a',Other:'#2a3a4a',Crypto:'#f7931a',Cash:'#44546a'};
   const sectorMap={};
-  const addSector=(ticker,valor)=>{
-    const comp=SECTOR_ETF[ticker];
-    if(!comp)return;
-    Object.entries(comp).forEach(([s,pct])=>{
-      if(!sectorMap[s])sectorMap[s]=0;
-      sectorMap[s]+=valor*(pct/100);
-    });
-  };
-
-  [...mine,...ali].forEach(o=>addSector(o.ticker,o.valor_hoy||0));
+  const addSector=(t,v)=>{const comp=SECTOR_ETF[t];if(!comp)return;Object.entries(comp).forEach(([sec,p])=>{if(!sectorMap[sec])sectorMap[sec]=0;sectorMap[sec]+=v*(p/100);});};
+  allUSD.forEach(o=>addSector(o.ticker,o.valor_hoy||0));
   resto.forEach(r=>addSector(r.activo,r.valor_a||0));
-
   const sectorTotal=Object.values(sectorMap).reduce((a,b)=>a+b,0);
   const sectorArr=Object.entries(sectorMap).sort((a,b)=>b[1]-a[1]);
   const maxSec=sectorArr[0]?sectorArr[0][1]:1;
-
   const sectorHTML=sectorArr.map(([sec,val])=>{
-    const pctVal=val/sectorTotal*100;
-    const color=SECTOR_COLORS[sec]||'#6b7f96';
-    return`<div class="sector-box"><div class="sector-name">${sec}</div><div class="sector-pct" style="color:${color}">${pctVal.toFixed(1)}%</div><div class="sector-bar" style="background:${color};width:${val/maxSec*100}%"></div><div style="font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:3px">${usd(val,0)}</div></div>`;
+    const p=val/sectorTotal*100,color=SECTOR_COLORS[sec]||'#6b7f96';
+    return`<div class="sector-box"><div class="sector-name">${sec}</div><div class="sector-pct" style="color:${color}">${p.toFixed(1)}%</div><div class="sector-bar" style="background:${color};width:${val/maxSec*100}%"></div><div style="font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:3px">${usd(val,0)}</div></div>`;
   }).join('');
-
-  // Concentración por activo
-  const assetMap={};
-  [...mine,...ali].forEach(o=>{if(!assetMap[o.ticker])assetMap[o.ticker]=0;assetMap[o.ticker]+=o.valor_hoy||0;});
-  resto.forEach(r=>{const k=r.activo;if(!assetMap[k])assetMap[k]=0;assetMap[k]+=r.valor_a||0;});
-  const assetArr=Object.entries(assetMap).sort((a,b)=>b[1]-a[1]);
-  const maxAsset=assetArr[0]?assetArr[0][1]:1;
-  const assetHTML=assetArr.map(([ticker,val])=>{
-    const pctVal=val/granTA*100;
-    const isHigh=pctVal>25;
-    return`<div class="bar-row"><span class="bar-lbl">${ticker}</span><div class="bar-track"><div class="bar-fill" style="width:${val/maxAsset*100}%;background:${isHigh?'var(--warn)':'var(--blue)'}"></div><span class="bar-val">${usd(val,0)}</span></div><span class="bar-pct ${isHigh?'neg':'muted'}">${pctVal.toFixed(1)}%</span></div>`;
-  }).join('');
-
-  // Correlación simple (texto)
-  const spyCorr=`SPY, QQQ y SPYG tienen correlación >0.90 entre sí. Aproximadamente el ${(()=>{
-    const spyV=assetMap['SPY']||0,qqqV=assetMap['QQQ']||0,spygV=assetMap['SPYG']||0;
-    return ((spyV+qqqV+spygV)/granTA*100).toFixed(0);
-  })()}% de tu portfolio USD se mueve en sintonía con el mercado amplio.`;
-
-  // Tech real
   const techPct=((sectorMap['Tech']||0)/sectorTotal*100).toFixed(1);
 
   const html=`
     <div class="kpi-row">
-      <div class="kpi b"><div class="kl">Exposición tech real</div><div class="kv">${techPct}%</div><div class="ks muted">abriendo todos los ETFs</div></div>
-      <div class="kpi g"><div class="kl">Activos distintos</div><div class="kv">${assetArr.length}</div><div class="ks muted">en todo el portfolio</div></div>
-      <div class="kpi o"><div class="kl">Mayor posición</div><div class="kv" style="font-size:16px">${assetArr[0]?assetArr[0][0]:'—'}</div><div class="ks muted">${assetArr[0]?((assetArr[0][1]/granTA*100).toFixed(1)+'% del total'):'—'}</div></div>
-      <div class="kpi" style="border-color:rgba(255,107,74,.3)"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--warn)"></div><div class="kl">Concentración tech</div><div class="kv ${+techPct>50?'neg':'pos'}">${+techPct>50?'Alta':'Moderada'}</div><div class="ks muted">${+techPct>50?'Considerar diversificar':'Dentro de parámetros'}</div></div>
+      <div class="kpi b"><div class="kl">Exposición tech real</div><div class="kv">${techPct}%</div><div class="ks muted">ETFs abiertos</div></div>
+      <div class="kpi g"><div class="kl">Le ganás al SPY</div><div class="kv">${beatSpy}<span style="font-size:12px;color:var(--dim)"> lotes</span></div><div class="ks muted">vs ${loseSpy} que pierden</div></div>
+      <div class="kpi o"><div class="kl">En rojo</div><div class="kv">${losers.length}<span style="font-size:12px;color:var(--dim)"> posiciones</span></div><div class="ks muted">ver break-even ↓</div></div>
+      <div class="kpi p"><div class="kl">Aportes al P&L</div><div class="kv" style="font-size:15px">${plArr[0]?plArr[0][0]:'—'} 🏆</div><div class="ks pos">${plArr[0]?usd(plArr[0][1]):''}</div></div>
     </div>
-    <div class="notice-blue">ℹ️ ${spyCorr}</div>
+
+    <div class="card"><div class="ch"><span class="ct">Waterfall · quién aporta tu ganancia</span><span class="badge bb">P&L por activo</span></div>
+      <div style="padding:16px;height:240px"><canvas id="chartWaterfall"></canvas></div>
+    </div>
+
     <div class="g2">
-      <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Exposición por sector real</span><span class="badge bb">ETFs abiertos</span></div><div class="sector-grid">${sectorHTML}</div></div>
-      <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Concentración por activo</span><span class="badge br">>25% = alto</span></div><div class="cb">${assetHTML}</div></div>
-    </div>
-    <div class="card"><div class="ch"><span class="ct">Correlación entre posiciones</span></div>
-      <div class="cb">
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-          <div style="background:var(--surface);border-radius:8px;padding:12px;border:1px solid rgba(255,107,74,.2)"><div style="font-family:var(--mono);font-size:10px;color:var(--warn);margin-bottom:6px">Alta correlación (>0.85)</div><div style="font-size:12px;color:var(--dim);line-height:1.8">SPY ↔ QQQ<br>SPY ↔ SPYG<br>QQQ ↔ SPYG<br>SPY ↔ AAPL</div></div>
-          <div style="background:var(--surface);border-radius:8px;padding:12px;border:1px solid rgba(240,180,41,.2)"><div style="font-family:var(--mono);font-size:10px;color:var(--gold);margin-bottom:6px">Correlación media (0.5-0.85)</div><div style="font-size:12px;color:var(--dim);line-height:1.8">SPY ↔ XLK<br>SPY ↔ META<br>QQQ ↔ MSFT<br>SPY ↔ MELI</div></div>
-          <div style="background:var(--surface);border-radius:8px;padding:12px;border:1px solid rgba(0,200,150,.2)"><div style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-bottom:6px">Baja correlación (<0.5)</div><div style="font-size:12px;color:var(--dim);line-height:1.8">SPY ↔ BTC<br>SPY ↔ XLE<br>SPY ↔ XLV<br>SPY ↔ USDT</div></div>
-        </div>
+      <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Rendimiento anualizado + vs SPY</span><span class="badge bb">CAGR real por lote</span></div>
+        <div style="padding:0 14px 12px;overflow-x:auto;max-height:340px;overflow-y:auto"><table><thead><tr><th>Ticker</th><th>Broker</th><th class="r">Días</th><th class="r">Total</th><th class="r">Anualiz.</th><th class="r">vs SPY</th></tr></thead><tbody>${rowsCagr}</tbody></table></div>
+        <div style="padding:8px 14px;border-top:1px solid var(--border);font-family:var(--mono);font-size:9px;color:var(--dim)">"Anualiz." = a qué ritmo anual creció ese lote. Un +5% en 30 días ≈ +80% anualizado. "vs SPY" compara contra comprar SPY el mismo día.</div>
       </div>
-    </div>`;
+      <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Break-even · qué necesitás para recuperar</span><span class="badge bo">asimetría de pérdidas</span></div>
+        ${losers.length?`<div style="padding:0 14px 12px;overflow-x:auto"><table><thead><tr><th>Posición</th><th class="r">Caída</th><th class="r">Necesita subir</th><th class="r">Pérdida</th></tr></thead><tbody>${rowsBE}</tbody></table></div>
+        <div style="padding:8px 14px;border-top:1px solid var(--border);font-family:var(--mono);font-size:9px;color:var(--dim)">Una caída de -50% necesita +100% para recuperar. Por eso las pérdidas grandes pesan más de lo que parecen.</div>`
+        :'<div style="padding:20px;text-align:center;color:var(--accent);font-family:var(--mono);font-size:11px">🎉 Ninguna posición en rojo</div>'}
+      </div>
+    </div>
+
+    <div class="card"><div class="ch"><span class="ct">Exposición por sector real</span><span class="badge bb">ETFs abiertos</span></div><div class="sector-grid">${sectorHTML}</div></div>`;
 
   document.getElementById('tab-analisis').innerHTML=html;
 
-  // Chart sectores
   setTimeout(()=>{
-    // no chart needed, using sector grid
+    const ctx=document.getElementById('chartWaterfall');
+    if(ctx&&window.Chart){
+      new Chart(ctx,{type:'bar',data:{
+        labels:plArr.map(x=>x[0]),
+        datasets:[{data:plArr.map(x=>+x[1].toFixed(2)),
+          backgroundColor:plArr.map(x=>x[1]>=0?'rgba(0,200,150,.6)':'rgba(255,107,74,.6)'),
+          borderColor:plArr.map(x=>x[1]>=0?'#00c896':'#ff6b4a'),borderWidth:1}]},
+        options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{display:false},tooltip:{enabled:!PRIVACY}},
+          scales:{x:{ticks:PRIVACY?{display:false}:{color:'#6b7f96',font:{size:9},callback:v=>'$'+v},grid:{color:'#1e2a3a'}},
+                  y:{ticks:{color:'#c8d6e8',font:{family:'IBM Plex Mono',size:10}},grid:{display:false}}}}});
+    }
   },100);
 }
 
-// ════════════════════════════════════════════════════════
-//  TAB 4: ALERTAS
-// ════════════════════════════════════════════════════════
-function renderAlertas() {
-  const {mine,ali,cartera,resto}=STATE;
+// ════════ TAB 4: ALERTAS ════════
+function renderAlertas(){
+  const {mine,ali,resto}=STATE;
   const allUSD=[...mine,...ali];
   const granTA=s(allUSD,'valor_hoy')+s(resto,'valor_a');
-
-  // Calcular alertas
+  const OBJETIVO=45000;
   const alerts=[];
+  const objDelta=v=>` Impacto en objetivo casa: ${(v/OBJETIVO*100).toFixed(2)}% de los U$D 45.000.`;
 
-  // 1. Posiciones con pérdida > 5%
+  // pérdidas
   const losers=allUSD.filter(o=>o.var_pct!=null&&o.var_pct<-5);
   if(losers.length>0){
-    const total=losers.reduce((s,o)=>s+(o.valor_hoy||0),0);
     const pl=losers.reduce((s,o)=>s+((o.valor_hoy||0)-(o.valor_c||0)),0);
-    alerts.push({type:'warn',icon:'📉',title:`${losers.length} posición${losers.length>1?'es':''} con pérdida > 5%`,body:`${losers.map(o=>`${o.ticker} (${o.broker}): ${pct(o.var_pct)}`).join(' · ')}. Pérdida total: ${usd(pl)}. Podría considerarse venta con pérdida para compensar ganancias fiscales.`});
+    alerts.push({type:'warn',icon:'📉',title:`${losers.length} posición${losers.length>1?'es':''} con pérdida > 5%`,body:`${losers.map(o=>`${o.ticker} (${o.broker}): ${pct(o.var_pct)}`).join(' · ')}. Pérdida total: ${usd(pl)}.${objDelta(Math.abs(pl))}`});
   }
 
-  // 2. BTC pérdida grande
+  // BTC análisis con tiempo de tenencia
   const btc=resto.find(r=>r.activo==='BTC');
-  if(btc&&btc.pl_pct<-30){
-    alerts.push({type:'warn',icon:'₿',title:'BTC con pérdida significativa',body:`Posición BTC en Nexo: ${pct(btc.pl_pct)} (${usd(btc.pl)}). Representa el ${((btc.valor_a/granTA)*100).toFixed(1)}% del portfolio total. Evaluar si mantener o tomar la pérdida.`});
+  if(btc&&btc.pl_pct!=null&&btc.pl_pct<-30){
+    const days=daysHeld(btc.fecha);
+    const needed=((btc.valor_c/btc.valor_a-1)*100).toFixed(0);
+    alerts.push({type:'warn',icon:'₿',title:`BTC: ${pct(btc.pl_pct)} tras ${days} días — zona de decisión`,body:`Está muy abajo de tu precio de entrada y necesita +${needed}% para recuperar. Históricamente BTC tuvo caídas de 40-80% seguidas tanto de rebotes fuertes como de años laterales. Es tu posición más volátil — seguila de cerca: si rompe abajo de tu punto actual conviene revisar la tesis; si consolida, puede ser zona de acumulación. Monto en juego: ${usd(btc.valor_a)}.`});
   }
 
-  // 3. Concentración alta en SPY family
+  // concentración índices
   const spyFam=['SPY','QQQ','SPYG'];
-  const spyVal=allUSD.filter(o=>spyFam.includes(o.ticker)).reduce((s,o)=>s+(o.valor_hoy||0),0)
-    + resto.filter(r=>spyFam.includes(r.activo)).reduce((s,r)=>s+r.valor_a,0);
+  const spyVal=allUSD.filter(o=>spyFam.includes(o.ticker)).reduce((s,o)=>s+(o.valor_hoy||0),0)+resto.filter(r=>spyFam.includes(r.activo)).reduce((s,r)=>s+r.valor_a,0);
   const spyPct=spyVal/granTA*100;
-  if(spyPct>45){
-    alerts.push({type:'info',icon:'⚖️',title:`Alta concentración en índices USA (${spyPct.toFixed(0)}%)`,body:`SPY + QQQ + SPYG representan el ${spyPct.toFixed(1)}% de tu portfolio. Es una apuesta fuerte al mercado americano. No es necesariamente malo, pero si el mercado cae 20%, tu portfolio cae ~${(spyPct*0.2).toFixed(0)}% solo por estas posiciones.`});
-  }
+  if(spyPct>45)alerts.push({type:'info',icon:'⚖️',title:`Concentración en índices USA: ${spyPct.toFixed(0)}%`,body:`SPY + QQQ + SPYG son el ${spyPct.toFixed(1)}% del portfolio. Si el mercado cae 20%, estas posiciones restan ~${usd(spyVal*0.2,0)} al objetivo casa (${(spyVal*0.2/OBJETIVO*100).toFixed(1)}% de los 45k).`});
 
-  // 4. USDT rendimiento
+  // Nexo interés real
   const usdtTotal=resto.filter(r=>r.activo==='USDT').reduce((s,r)=>s+r.valor_a,0);
-  if(usdtTotal>500){
-    const anualInterest=usdtTotal*0.115;
-    alerts.push({type:'gold',icon:'💰',title:`USDT en Nexo generando intereses: ~${usd(anualInterest,0)}/año`,body:`Tenés ${usd(usdtTotal,0)} en USDT al 11.5% anual en Nexo. Eso es ~${usd(anualInterest/12,0)}/mes en intereses. Asegurate de que la tasa siga activa en tu cuenta.`});
+  if(usdtTotal>100){
+    const anual=NEXO_DAILY_INTEREST*365;
+    const rate=(anual/usdtTotal*100).toFixed(1);
+    alerts.push({type:'gold',icon:'💰',title:`Interés Nexo real: ${usd(NEXO_DAILY_INTEREST)} /día → ~${usd(anual,0)}/año (${rate}%)`,body:`Sobre tus ${usd(usdtTotal,0)} en USDT. Es plata que entra sin volatilidad — la capa más confiable para el objetivo casa. En 12 meses suma ${(anual/OBJETIVO*100).toFixed(2)}% de los 45k sin hacer nada.`});
   }
 
-  // 5. Rebalanceo sugerido
-  const techPct=((()=>{
-    const TECH=['META','AAPL','MSFT','XLK'];
-    return allUSD.filter(o=>TECH.includes(o.ticker)).reduce((s,o)=>s+(o.valor_hoy||0),0)
-      + resto.filter(r=>TECH.includes(r.activo)).reduce((s,r)=>s+r.valor_a,0);
-  })()/granTA*100);
-  if(techPct>30){
-    alerts.push({type:'info',icon:'🔄',title:`Exposición tech directa alta: ${techPct.toFixed(0)}%`,body:`Sin contar los ETFs, META + AAPL + MSFT + XLK representan el ${techPct.toFixed(1)}% del portfolio. Si sumás la exposición tech dentro de SPY/QQQ, el total supera el 50%. Próximas compras en sectores como Salud (XLV) o Energía (XLE) mejorarían la diversificación.`});
-  }
-
-  // 6. Posiciones ganadoras grandes
+  // ganadoras
   const winners=allUSD.filter(o=>o.var_pct!=null&&o.var_pct>20);
-  if(winners.length>0){
-    alerts.push({type:'ok',icon:'🚀',title:`${winners.length} posición${winners.length>1?'es':''} con ganancia > 20%`,body:`${winners.map(o=>`${o.ticker}: ${pct(o.var_pct)}`).join(' · ')}. Excelente rendimiento. Si alguna representa más del 15% del portfolio, podría ser momento de tomar parcialmente la ganancia para rebalancear.`});
-  }
+  if(winners.length>0)alerts.push({type:'ok',icon:'🚀',title:`${winners.length} lote${winners.length>1?'s':''} con ganancia > 20%`,body:`${winners.map(o=>`${o.ticker}: ${pct(o.var_pct)}`).join(' · ')}. La ganancia no realizada suma ${usd(winners.reduce((s,o)=>s+(o.valor_hoy-o.valor_c),0))} al objetivo.`});
 
-  // 7. Ali proyección
+  // XLK máximo
+  const xlk=allUSD.filter(o=>o.ticker==='XLK');
+  if(xlk.length&&xlk.every(o=>o.var_pct>20))alerts.push({type:'info',icon:'📈',title:'XLK: todos tus lotes arriba de +20%',body:'Tech puro viene siendo tu mejor sector. Cuando una posición corre tanto por encima del resto, algunos inversores toman ganancias parciales para asegurar el avance hacia su objetivo. Otros la dejan correr. Depende de tu horizonte — pero tenerlo presente es clave.'});
+
+  // Ali
   const aliTotal=s(STATE.ali,'valor_hoy');
-  const aliIn10=aliTotal*Math.pow(1.10,10);
-  alerts.push({type:'ok',icon:'👶🏻',title:`Ali en 10 años: ${usd(aliIn10,0)} (tasa histórica SPY)`,body:`Con ${usd(aliTotal)} actuales y 10% anual histórico del SPY, el portfolio de Ali llegaría a ${usd(aliIn10,0)} en 2036. Cada compra mensual acelera esa curva significativamente.`});
+  alerts.push({type:'ok',icon:'👶🏻',title:`Ali en 10 años: ${usd(aliTotal*Math.pow(1.10,10),0)} (10% histórico SPY)`,body:`Con ${usd(aliTotal)} actuales. Nota: el fondo de Ali es de Ali — no cuenta para el objetivo casa.`});
 
-  // 8. Próxima compra sugerida
-  const sectorDef=['Salud (XLV)','Energía (XLE)','Internacional (VEA/EEM)'];
-  alerts.push({type:'info',icon:'🎯',title:'Sugerencia próxima compra',body:`Basado en tu portfolio actual, los sectores subrepresentados son: ${sectorDef.join(', ')}. XLV ya tenés en Nexo — podrías reforzarla. Agregar un ETF internacional (VEA o EEM) reduciría la concentración en USA.`});
+  const alertHTML=alerts.map(a=>`<div class="alert-card alert-${a.type}"><div class="alert-icon">${a.icon}</div><div><div class="alert-title" style="color:${a.type==='warn'?'var(--warn)':a.type==='ok'?'var(--accent)':a.type==='gold'?'var(--gold)':'var(--blue)'}">${a.title}</div><div class="alert-body">${a.body}</div></div></div>`).join('');
+  document.getElementById('tab-alertas').innerHTML=`<div class="notice-green">✅ ${alerts.filter(a=>a.type==='ok').length} positivas · ⚠️ ${alerts.filter(a=>a.type==='warn').length} alertas · ℹ️ ${alerts.filter(a=>a.type==='info'||a.type==='gold').length} sugerencias — todas calculadas en vivo sobre tus datos</div>${alertHTML}`;
+}
 
-  const alertHTML=alerts.map(a=>`
-    <div class="alert-card alert-${a.type}">
-      <div class="alert-icon">${a.icon}</div>
-      <div><div class="alert-title" style="color:${a.type==='warn'?'var(--warn)':a.type==='ok'?'var(--accent)':a.type==='gold'?'var(--gold)':'var(--blue)'}">${a.title}</div>
-      <div class="alert-body">${a.body}</div></div>
-    </div>`).join('');
+// ════════ TAB 5: CASA PROPIA ════════
+let simSlider=0;
+function renderCasa(){
+  const OBJETIVO=45000;
+  const {mine,ali,resto}=STATE;
+  // Ali NO cuenta para la casa (es de Ali)
+  const actual=s(mine,'valor_hoy')+s(resto,'valor_a');
+  const pctAlc=Math.min(actual/OBJETIVO*100,100);
+  const falta=Math.max(OBJETIVO-actual,0);
+  const listo=actual>=OBJETIVO;
+  const color=listo?'#00c896':pctAlc>=75?'#00c896':pctAlc>=50?'#f0b429':'#3d8fff';
+
+  // Capas de riesgo
+  const layers={estable:0,mercado:0,volatil:0};
+  mine.forEach(o=>{layers[riskLayer(o.ticker,'')]+=o.valor_hoy||0;});
+  resto.forEach(r=>{layers[riskLayer(r.activo,r.cat)]+=r.valor_a||0;});
+  const layerPct=k=>actual>0?(layers[k]/actual*100):0;
+
+  const R=80,stroke=16,circ=Math.PI*100;
+  const filled=pctAlc/100*circ;
 
   const html=`
-    <div class="notice-green">✅ ${alerts.filter(a=>a.type==='ok').length} señales positivas · ⚠️ ${alerts.filter(a=>a.type==='warn').length} alertas · ℹ️ ${alerts.filter(a=>a.type==='info'||a.type==='gold').length} sugerencias</div>
-    ${alertHTML}`;
-
-  document.getElementById('tab-alertas').innerHTML=html;
-}
-
-// ════════════════════════════════════════════════════════
-//  TAB 5: CASA PROPIA
-// ════════════════════════════════════════════════════════
-function renderCasa() {
-  const OBJETIVO = 45000;
-  const {mine,ali,resto} = STATE;
-  const actual = s(mine,'valor_hoy') + s(ali,'valor_hoy') + s(resto,'valor_a');
-  const pctAlcanzado = Math.min(actual / OBJETIVO * 100, 100);
-  const falta = Math.max(OBJETIVO - actual, 0);
-  const listo = actual >= OBJETIVO;
-
-  // Arco SVG
-  const R = 80, stroke = 16;
-  const circ = Math.PI * R; // semicírculo
-  const filled = pctAlcanzado / 100 * circ;
-  const color = listo ? '#00c896' : pctAlcanzado >= 75 ? '#00c896' : pctAlcanzado >= 50 ? '#f0b429' : '#3d8fff';
-
-  const html = `
-    <div style="max-width:520px;margin:0 auto;text-align:center;padding-top:20px">
-
-      <!-- Arco de progreso -->
-      <div style="position:relative;display:inline-block;margin-bottom:8px">
+    <div style="max-width:640px;margin:0 auto;padding-top:10px">
+      <div style="text-align:center">
         <svg width="240" height="130" viewBox="0 0 240 130">
-          <!-- Track -->
-          <path d="M 20 120 A 100 100 0 0 1 220 120"
-            fill="none" stroke="#1e2a3a" stroke-width="${stroke}" stroke-linecap="round"/>
-          <!-- Fill -->
-          <path d="M 20 120 A 100 100 0 0 1 220 120"
-            fill="none" stroke="${color}" stroke-width="${stroke}" stroke-linecap="round"
-            stroke-dasharray="${filled} ${circ}"
-            style="transition:stroke-dasharray 1s ease"/>
-          <!-- Valor actual -->
-          <text x="120" y="90" text-anchor="middle" font-family="IBM Plex Mono" font-size="22" font-weight="600" fill="#eaf2ff">${pctAlcanzado.toFixed(1)}%</text>
+          <path d="M 20 120 A 100 100 0 0 1 220 120" fill="none" stroke="#1e2a3a" stroke-width="${stroke}" stroke-linecap="round"/>
+          <path d="M 20 120 A 100 100 0 0 1 220 120" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-linecap="round" stroke-dasharray="${filled} ${circ}" style="transition:stroke-dasharray 1s ease"/>
+          <text x="120" y="90" text-anchor="middle" font-family="IBM Plex Mono" font-size="22" font-weight="600" fill="#eaf2ff">${pctAlc.toFixed(1)}%</text>
           <text x="120" y="110" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#6b7f96">del objetivo</text>
         </svg>
-      </div>
-
-      <!-- Números principales -->
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6b7f96;margin-bottom:24px">
-        ${listo
-          ? `<span style="color:#00c896;font-size:16px;font-weight:600">🏠 Objetivo alcanzado</span>`
-          : `Faltan <span style="color:#eaf2ff;font-weight:600">${usd(falta,0)}</span>`
-        }
-      </div>
-
-      <!-- Barra lineal -->
-      <div style="background:#1e2a3a;border-radius:6px;height:10px;margin:0 0 28px;overflow:hidden">
-        <div style="height:100%;width:${pctAlcanzado}%;background:${color};border-radius:6px;transition:width 1s ease"></div>
-      </div>
-
-      <!-- KPIs -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:28px">
-        <div style="background:#161d29;border:1px solid #1e2a3a;border-radius:9px;padding:14px">
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6b7f96;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Portfolio actual</div>
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#eaf2ff">${usd(actual,0)}</div>
-        </div>
-        <div style="background:#161d29;border:1px solid ${color}44;border-radius:9px;padding:14px">
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6b7f96;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Objetivo</div>
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:${color}">${usd(OBJETIVO,0)}</div>
-        </div>
-        <div style="background:#161d29;border:1px solid #1e2a3a;border-radius:9px;padding:14px">
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6b7f96;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">${listo?'Excedente':'Falta'}</div>
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:${listo?'#00c896':'#eaf2ff'}">${usd(Math.abs(OBJETIVO-actual),0)}</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--dim);margin:4px 0 20px">
+          ${listo?`<span style="color:#00c896;font-size:16px;font-weight:600">🏠 Objetivo alcanzado</span>`:`Faltan <span style="color:#eaf2ff;font-weight:600">${usd(falta,0)}</span>`}
         </div>
       </div>
 
-      <!-- Milestones -->
-      <div style="text-align:left">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6b7f96;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px">Hitos</div>
-        ${[25,50,75,100].map(hito=>{
-          const hitVal = OBJETIVO * hito / 100;
-          const done = actual >= hitVal;
-          return `<div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #1e2a3a22">
-            <div style="width:22px;height:22px;border-radius:50%;border:2px solid ${done?color:'#1e2a3a'};background:${done?color+'22':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
-              ${done?`<span style="color:${color};font-size:11px">✓</span>`:''}
-            </div>
-            <div style="flex:1;font-family:'IBM Plex Mono',monospace;font-size:11px;color:${done?'#eaf2ff':'#6b7f96'}">${usd(hitVal,0)} <span style="color:#6b7f96">(${hito}%)</span></div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:${done?color:'#6b7f96'}">${done?'✅ alcanzado':'pendiente'}</div>
+      <div style="background:#1e2a3a;border-radius:6px;height:10px;margin-bottom:24px;overflow:hidden"><div style="height:100%;width:${pctAlc}%;background:${color};border-radius:6px"></div></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px">
+        <div class="kpi"><div class="kl">Portfolio (sin Ali)</div><div class="kv" style="font-size:16px">${usd(actual,0)}</div></div>
+        <div class="kpi"><div class="kl">Objetivo</div><div class="kv" style="font-size:16px;color:${color}">${usd(OBJETIVO,0)}</div></div>
+        <div class="kpi"><div class="kl">${listo?'Excedente':'Falta'}</div><div class="kv" style="font-size:16px">${usd(Math.abs(OBJETIVO-actual),0)}</div></div>
+      </div>
+
+      <!-- CAPAS DE RIESGO -->
+      <div class="card"><div class="ch"><span class="ct">Capas de riesgo · ¿qué tan sólido es tu avance?</span></div>
+        <div class="cb">
+          <div style="display:flex;height:22px;border-radius:5px;overflow:hidden;margin-bottom:12px">
+            <div style="width:${layerPct('estable')}%;background:#00c896" title="Estable"></div>
+            <div style="width:${layerPct('mercado')}%;background:#3d8fff" title="Mercado"></div>
+            <div style="width:${layerPct('volatil')}%;background:#ff6b4a" title="Volátil"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+            <div><div style="font-family:var(--mono);font-size:10px;color:#00c896;font-weight:600">🟢 Estable ${layerPct('estable').toFixed(0)}%</div><div style="font-family:var(--mono);font-size:13px;color:var(--hi);margin:2px 0">${usd(layers.estable,0)}</div><div style="font-size:10px;color:var(--dim)">FCI + USDT. Casi seguro para la casa.</div></div>
+            <div><div style="font-family:var(--mono);font-size:10px;color:#3d8fff;font-weight:600">🔵 Mercado ${layerPct('mercado').toFixed(0)}%</div><div style="font-family:var(--mono);font-size:13px;color:var(--hi);margin:2px 0">${usd(layers.mercado,0)}</div><div style="font-size:10px;color:var(--dim)">ETFs amplios. Puede variar ±20%.</div></div>
+            <div><div style="font-family:var(--mono);font-size:10px;color:#ff6b4a;font-weight:600">🔴 Volátil ${layerPct('volatil').toFixed(0)}%</div><div style="font-family:var(--mono);font-size:13px;color:var(--hi);margin:2px 0">${usd(layers.volatil,0)}</div><div style="font-size:10px;color:var(--dim)">BTC + acciones. Puede variar ±50%.</div></div>
+          </div>
+          <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--dim)">
+            💡 Si mañana aparece la casa: <span style="color:#00c896">${usd(layers.estable,0)}</span> rescatables sin riesgo + <span style="color:#3d8fff">${usd(layers.mercado,0)}</span> a precio de mercado del día.
+          </div>
+        </div>
+      </div>
+
+      <!-- SIMULADOR -->
+      <div class="card"><div class="ch"><span class="ct">Simulador · ¿y si el mercado se mueve?</span></div>
+        <div class="cb">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+            <span style="font-family:var(--mono);font-size:10px;color:var(--warn)">-40%</span>
+            <input type="range" min="-40" max="40" value="${simSlider}" step="5" oninput="simSlider=+this.value;updateSim()">
+            <span style="font-family:var(--mono);font-size:10px;color:var(--accent)">+40%</span>
+          </div>
+          <div id="sim-result"></div>
+        </div>
+      </div>
+
+      <!-- CALCULADORA -->
+      <div class="card"><div class="ch"><span class="ct">Calculadora · tu camino, tus números</span></div>
+        <div class="cb">
+          <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+            <div><div style="font-family:var(--mono);font-size:9px;color:var(--dim);margin-bottom:4px">APORTE MENSUAL U$D</div><input class="sim-input" type="number" id="calc-aporte" value="300" oninput="updateCalc()"></div>
+            <div><div style="font-family:var(--mono);font-size:9px;color:var(--dim);margin-bottom:4px">RENDIMIENTO ANUAL %</div><input class="sim-input" type="number" id="calc-tasa" value="8" oninput="updateCalc()"></div>
+          </div>
+          <div id="calc-result"></div>
+        </div>
+      </div>
+
+      <!-- HITOS -->
+      <div class="card"><div class="ch"><span class="ct">Hitos</span></div><div class="cb">
+        ${[25,50,75,100].map(h=>{
+          const hv=OBJETIVO*h/100,done=actual>=hv;
+          return`<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(30,42,58,.4)">
+            <div style="width:22px;height:22px;border-radius:50%;border:2px solid ${done?color:'#1e2a3a'};background:${done?color+'22':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0">${done?`<span style="color:${color};font-size:11px">✓</span>`:''}</div>
+            <div style="flex:1;font-family:var(--mono);font-size:11px;color:${done?'var(--hi)':'var(--dim)'}">${usd(hv,0)} <span class="muted">(${h}%)</span></div>
+            <div style="font-family:var(--mono);font-size:10px;color:${done?color:'var(--dim)'}">${done?'✅ alcanzado':'pendiente'}</div>
           </div>`;
         }).join('')}
-      </div>
-
+      </div></div>
     </div>`;
 
-  document.getElementById('tab-casa').innerHTML = html;
+  document.getElementById('tab-casa').innerHTML=html;
+  updateSim();updateCalc();
 }
 
-// ════════════════════════════════════════════════════════
-//  INIT
-// ════════════════════════════════════════════════════════
+function updateSim(){
+  const el=document.getElementById('sim-result');
+  if(!el)return;
+  const OBJETIVO=45000;
+  const {mine,resto}=STATE;
+  const layers={estable:0,mercado:0,volatil:0};
+  mine.forEach(o=>{layers[riskLayer(o.ticker,'')]+=o.valor_hoy||0;});
+  resto.forEach(r=>{layers[riskLayer(r.activo,r.cat)]+=r.valor_a||0;});
+  const mv=simSlider/100;
+  const nuevo=layers.estable+layers.mercado*(1+mv)+layers.volatil*(1+mv*1.5);
+  const actual=layers.estable+layers.mercado+layers.volatil;
+  const delta=nuevo-actual;
+  const nuevoP=nuevo/OBJETIVO*100;
+  el.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">
+    <div><div style="font-family:var(--mono);font-size:9px;color:var(--dim)">MERCADO</div><div style="font-family:var(--mono);font-size:16px;font-weight:600;color:${simSlider>=0?'var(--accent)':'var(--warn)'}">${simSlider>=0?'+':''}${simSlider}%</div></div>
+    <div><div style="font-family:var(--mono);font-size:9px;color:var(--dim)">TU PORTFOLIO</div><div style="font-family:var(--mono);font-size:16px;font-weight:600;color:var(--hi)">${usd(nuevo,0)}</div><div style="font-family:var(--mono);font-size:10px" class="${pc(delta)}">${usd(delta,0)}</div></div>
+    <div><div style="font-family:var(--mono);font-size:9px;color:var(--dim)">DEL OBJETIVO</div><div style="font-family:var(--mono);font-size:16px;font-weight:600;color:var(--hi)">${nuevoP.toFixed(1)}%</div></div>
+  </div>
+  <div style="margin-top:10px;font-family:var(--mono);font-size:9px;color:var(--dim);text-align:center">La capa volátil (BTC, acciones) se mueve 1.5× el mercado. La estable no se mueve.</div>`;
+}
+
+function updateCalc(){
+  const el=document.getElementById('calc-result');
+  if(!el)return;
+  const OBJETIVO=45000;
+  const {mine,resto}=STATE;
+  const actual=s(mine,'valor_hoy')+s(resto,'valor_a');
+  const aporte=+((document.getElementById('calc-aporte')||{}).value||0);
+  const tasa=+((document.getElementById('calc-tasa')||{}).value||0)/100;
+  const rMes=Math.pow(1+tasa,1/12)-1;
+  let cap=actual,meses=0;
+  while(cap<OBJETIVO&&meses<600){cap=cap*(1+rMes)+aporte;meses++;}
+  const yrs=Math.floor(meses/12),ms=meses%12;
+  const fecha=new Date();fecha.setMonth(fecha.getMonth()+meses);
+  el.innerHTML=meses>=600
+    ?`<div style="font-family:var(--mono);font-size:11px;color:var(--warn)">Con esos números no se alcanza en un plazo razonable. Probá subir el aporte.</div>`
+    :`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:center">
+      <div style="background:var(--surface);border-radius:8px;padding:12px"><div style="font-family:var(--mono);font-size:9px;color:var(--dim)">LLEGARÍAS EN</div><div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--accent)">${yrs>0?yrs+'a ':''}${ms}m</div></div>
+      <div style="background:var(--surface);border-radius:8px;padding:12px"><div style="font-family:var(--mono);font-size:9px;color:var(--dim)">FECHA ESTIMADA</div><div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--hi)">${fecha.toLocaleDateString('es-AR',{month:'short',year:'numeric'})}</div></div>
+    </div>
+    <div style="margin-top:10px;font-family:var(--mono);font-size:9px;color:var(--dim);text-align:center">Vos controlás los números — esto solo hace la cuenta compuesta.</div>`;
+}
+
+// ════════ INIT ════════
+updatePrivacyBtn();
 loadAll();
 setInterval(loadAll,10*60*1000);
 </script>
