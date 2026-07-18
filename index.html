@@ -147,7 +147,6 @@ input[type=range]{width:100%;accent-color:var(--blue)}
   <div class="tab" onclick="showTab('analisis')">Análisis</div>
   <div class="tab" onclick="showTab('alertas')">Alertas</div>
   <div class="tab" onclick="showTab('casa')">🏠 Casa Propia</div>
-  <div class="tab" onclick="showTab('agente')">🤖 Agente</div>
 </div>
 
 <div id="tab-portfolio" class="tab-panel active"><div class="loading"><div class="spin">⟳</div><br>Cargando...</div></div>
@@ -155,7 +154,6 @@ input[type=range]{width:100%;accent-color:var(--blue)}
 <div id="tab-analisis" class="tab-panel"></div>
 <div id="tab-alertas" class="tab-panel"></div>
 <div id="tab-casa" class="tab-panel"></div>
-<div id="tab-agente" class="tab-panel"></div>
 
 <script>
 // ════════ PRIVACY MODE ════════
@@ -176,7 +174,7 @@ function updatePrivacyBtn(){
 let activeTab='portfolio';
 function showTab(id){
   document.querySelectorAll('.tab').forEach((t,i)=>{
-    const ids=['portfolio','evolucion','analisis','alertas','casa','agente'];
+    const ids=['portfolio','evolucion','analisis','alertas','casa'];
     t.classList.toggle('active',ids[i]===id);
   });
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -187,7 +185,6 @@ function showTab(id){
     if(id==='analisis')renderAnalisis();
     if(id==='alertas')renderAlertas();
     if(id==='casa')renderCasa();
-    if(id==='agente')renderAgente();
   }
 }
 
@@ -343,7 +340,6 @@ function renderAll(){
   if(activeTab==='analisis')renderAnalisis();
   if(activeTab==='alertas')renderAlertas();
   if(activeTab==='casa')renderCasa();
-  if(activeTab==='agente')renderAgente();
 }
 
 // ════════ UTILS ════════
@@ -863,243 +859,6 @@ function updateCalc(){
       <div style="background:var(--surface);border-radius:8px;padding:12px"><div style="font-family:var(--mono);font-size:9px;color:var(--dim)">FECHA ESTIMADA</div><div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--hi)">${fecha.toLocaleDateString('es-AR',{month:'short',year:'numeric'})}</div></div>
     </div>
     <div style="margin-top:10px;font-family:var(--mono);font-size:9px;color:var(--dim);text-align:center">Vos controlás los números — esto solo hace la cuenta compuesta.</div>`;
-}
-
-// ════════ 🤖 AGENTE FINANCIERO ════════
-const GASTOS_CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=815384903&single=true&output=csv';
-let GASTOS=null, AGENTE_CACHE={flujos:null,ahorro:null}, chartAhorro=null;
-
-function pnG(v){ // "$3,232,245.35" -> 3232245.35
-  if(v==null)return 0;
-  const n=parseFloat(String(v).replace(/[$\s]/g,'').replace(/,/g,''));
-  return isNaN(n)?0:n;
-}
-function ars(n,d=0){return PRIVACY?'•••':'$'+(n||0).toLocaleString('es-AR',{maximumFractionDigits:d});}
-
-async function fetchGastos(){
-  if(GASTOS)return GASTOS;
-  const res=await fetch(GASTOS_CSV_URL,{signal:AbortSignal.timeout(12000)});
-  if(!res.ok)throw new Error('gastos HTTP '+res.status);
-  const rows=parseCSV(await res.text());
-  const ingresos={},porCat={};let totalG=0,totalI=0;
-  for(let i=1;i<rows.length;i++){
-    const r=rows[i];if(!r||!r[0]||!r[0].trim())continue;
-    const cat=(r[2]||'').trim(),monto=pnG(r[3]),quien=(r[4]||'').trim();
-    if(!cat||!monto)continue;
-    if(cat==='Sueldo'){ingresos[quien||'?']=(ingresos[quien||'?']||0)+monto;totalI+=monto;}
-    else{porCat[cat]=(porCat[cat]||0)+monto;totalG+=monto;}
-  }
-  GASTOS={ingresos,porCat,totalG,totalI,periodo:'fines de junio + julio 2026 (parcial)'};
-  return GASTOS;
-}
-
-function contextoFinanciero(){
-  const {mine,resto,ars:arsItems}=STATE;
-  const usdTotal=s(mine,'valor_hoy')+s(resto,'valor_a');
-  const arsTotal=s(arsItems,'valor_a');
-  const porBroker={};
-  mine.forEach(o=>porBroker[o.broker]=(porBroker[o.broker]||0)+(o.valor_hoy||0));
-  resto.forEach(o=>porBroker[o.broker]=(porBroker[o.broker]||0)+(o.valor_a||0));
-  const porCatInv={};
-  resto.forEach(o=>porCatInv[o.cat]=(porCatInv[o.cat]||0)+(o.valor_a||0));
-  const cedTotal=s(mine,'valor_hoy');if(cedTotal)porCatInv['CEDEARs']=cedTotal;
-  let g='';
-  if(GASTOS){
-    const cats=Object.entries(GASTOS.porCat).sort((a,b)=>b[1]-a[1]).map(([c,v])=>`  - ${c}: ARS ${Math.round(v).toLocaleString('en')}`).join('\n');
-    const ing=Object.entries(GASTOS.ingresos).map(([q,v])=>`  - ${q}: ARS ${Math.round(v).toLocaleString('en')}`).join('\n');
-    g=`\nINGRESOS DEL HOGAR (${GASTOS.periodo}):\n${ing}\n  Total: ARS ${Math.round(GASTOS.totalI).toLocaleString('en')}\nGASTOS POR CATEGORÍA (mismo período):\n${cats}\n  Total gastos: ARS ${Math.round(GASTOS.totalG).toLocaleString('en')}`;
-  }
-  return `SITUACIÓN FINANCIERA REAL (datos en vivo de mis planillas):
-PORTFOLIO DE INVERSIONES:
-- Total en USD: ${usdTotal.toFixed(0)} USD (CEDEARs, ETFs, FCI USD, cripto, stablecoins)
-- Total en ARS: ${Math.round(arsTotal).toLocaleString('en')} ARS (acciones locales)
-- Por broker (USD): ${Object.entries(porBroker).map(([b,v])=>`${b}: ${v.toFixed(0)}`).join(', ')}
-- Por tipo de activo (USD): ${Object.entries(porCatInv).map(([c,v])=>`${c}: ${v.toFixed(0)}`).join(', ')}${g}
-CONTEXTO: Vivo en Argentina, hogar de 2 adultos + 1 hijo pequeño. Sueldos en pesos argentinos.`;
-}
-
-async function llamarClaude(prompt){
-  const key=localStorage.getItem('agente_api_key')||'';
-  if(!key)throw new Error('Falta la API key — pegala en ⚙️ CONFIG (abajo de todo) y guardala. La sacás de console.anthropic.com → API Keys.');
-  const headers={'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'};
-  let res;
-  try{
-    res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers,body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:3000,messages:[{role:'user',content:prompt}]})});
-  }catch(e){throw new Error('No se pudo conectar con api.anthropic.com — puede ser la red (¿PC del laburo con dominios bloqueados?) o un corte de conexión.');}
-  if(res.status===401)throw new Error('API key inválida o vencida — revisala en ⚙️ CONFIG.');
-  if(res.status===429)throw new Error('Rate limit de la API — esperá un minuto y probá de nuevo.');
-  if(!res.ok){const t=await res.text().catch(()=>'');throw new Error('API '+res.status+': '+t.slice(0,150));}
-  const data=await res.json();
-  const txt=data.content.filter(b=>b.type==='text').map(b=>b.text).join('\n');
-  try{return JSON.parse(txt.replace(/```json|```/g,'').trim());}
-  catch(e){throw new Error('La respuesta no vino en JSON válido — probá generar de nuevo.');}
-}
-
-const REGLAS_JSON='Respondé ÚNICAMENTE con un objeto JSON válido, sin texto antes ni después, sin markdown, sin backticks. Enfoque educativo y de planificación: NO recomiendes comprar o vender activos específicos ni des asesoría de inversión personalizada.';
-
-// ── Módulo 1: Mapa de flujos de ingresos ──
-async function runFlujos(){
-  const btn=document.getElementById('btn-flujos'),out=document.getElementById('out-flujos');
-  const horas=+document.getElementById('inp-horas').value||5;
-  const capital=+document.getElementById('inp-capital').value||0;
-  btn.disabled=true;btn.textContent='⟳ analizando...';
-  out.innerHTML='<div style="font-family:var(--mono);font-size:10px;color:var(--dim);padding:14px">El agente está analizando tus datos reales...</div>';
-  try{
-    await fetchGastos();
-    const prompt=`Actuá como un estratega financiero personal para Argentina en 2026 (hablame de vos, castellano rioplatense).
-${contextoFinanciero()}
-Tiempo semanal disponible para proyectos extra: ${horas} horas. Capital disponible para invertir en nuevos flujos: USD ${capital}.
-Actualmente dependo casi 100% de dos sueldos en relación de dependencia. Quiero diversificar fuentes de ingresos.
-Diseñá 7 posibles flujos de ingresos REALISTAS para mi situación y contexto argentino (considerá: rendimientos de lo ya invertido, productos digitales, servicios freelance, monotributo, etc.).
-${REGLAS_JSON}
-Formato: {"flujos":[{"nombre":str,"tipo":str,"dificultad":1-5,"costo_inicial_usd":num,"tiempo_hasta_ingresos":str,"riesgo":1-5,"escalabilidad":1-5,"orden":1-7,"nota":str}],"secuencia_12m":[{"periodo":str,"accion":str}],"checklist_resiliencia":[str],"comentario":str}`;
-    const d=await llamarClaude(prompt);
-    AGENTE_CACHE.flujos=d;renderFlujosResult(d);
-  }catch(e){out.innerHTML=`<div style="font-family:var(--mono);font-size:10px;color:var(--warn);padding:14px">Error: ${e.message}</div>`;}
-  btn.disabled=false;btn.textContent='▶ generar análisis';
-}
-function dots(n,max=5,color='var(--accent)'){let h='';for(let i=1;i<=max;i++)h+=`<span style="display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:2px;background:${i<=n?color:'var(--border)'}"></span>`;return h;}
-function renderFlujosResult(d){
-  const out=document.getElementById('out-flujos');if(!out||!d)return;
-  const rows=(d.flujos||[]).sort((a,b)=>a.orden-b.orden).map(f=>`<tr>
-    <td style="padding:8px 10px;font-family:var(--mono);color:var(--gold)">${f.orden}</td>
-    <td style="padding:8px 10px"><b style="color:var(--hi)">${f.nombre}</b><div style="font-size:10px;color:var(--dim)">${f.nota||''}</div></td>
-    <td style="padding:8px 10px">${dots(f.dificultad,5,'var(--warn)')}</td>
-    <td style="padding:8px 10px;font-family:var(--mono)">${PRIVACY?'•••':'U$D '+(f.costo_inicial_usd||0)}</td>
-    <td style="padding:8px 10px;font-family:var(--mono);font-size:10px">${f.tiempo_hasta_ingresos}</td>
-    <td style="padding:8px 10px">${dots(f.riesgo,5,'var(--warn)')}</td>
-    <td style="padding:8px 10px">${dots(f.escalabilidad,5,'var(--accent)')}</td></tr>`).join('');
-  const seq=(d.secuencia_12m||[]).map(s2=>`<div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="font-family:var(--mono);font-size:10px;color:var(--blue);min-width:90px">${s2.periodo}</span><span style="font-size:11px">${s2.accion}</span></div>`).join('');
-  const chk=(d.checklist_resiliencia||[]).map(c=>`<label style="display:flex;gap:8px;padding:4px 0;font-size:11px;cursor:pointer"><input type="checkbox" style="accent-color:var(--accent)">${c}</label>`).join('');
-  out.innerHTML=`
-    <div style="padding:12px 14px;font-size:11px;color:var(--text);border-bottom:1px solid var(--border)">${d.comentario||''}</div>
-    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">
-      <thead><tr style="font-family:var(--mono);font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px"><th style="padding:8px 10px;text-align:left">#</th><th style="padding:8px 10px;text-align:left">Flujo</th><th style="padding:8px 10px;text-align:left">Dificultad</th><th style="padding:8px 10px;text-align:left">Costo</th><th style="padding:8px 10px;text-align:left">Tiempo</th><th style="padding:8px 10px;text-align:left">Riesgo</th><th style="padding:8px 10px;text-align:left">Escala</th></tr></thead>
-      <tbody>${rows}</tbody></table></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px" class="ag-grid2">
-      <div><div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1.5px;margin-bottom:6px">SECUENCIA 12 MESES</div>${seq}</div>
-      <div><div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1.5px;margin-bottom:6px">CHECKLIST DE RESILIENCIA</div>${chk}</div>
-    </div>`;
-}
-
-// ── Módulo 2: Sistema de ahorro automático ──
-async function runAhorro(){
-  const btn=document.getElementById('btn-ahorro'),out=document.getElementById('out-ahorro');
-  const obj=document.getElementById('inp-objetivo').value;
-  btn.disabled=true;btn.textContent='⟳ analizando...';
-  out.innerHTML='<div style="font-family:var(--mono);font-size:10px;color:var(--dim);padding:14px">El agente está cruzando ingresos, gastos y portfolio...</div>';
-  try{
-    await fetchGastos();
-    const prompt=`Actuá como un planificador financiero personal para Argentina en 2026 (hablame de vos, castellano rioplatense).
-${contextoFinanciero()}
-Objetivo principal declarado: ${obj}.
-Quiero un sistema de ahorro AUTOMÁTICO que no dependa de fuerza de voluntad. Identificá qué gastos son fijos vs variables según las categorías, calculá capacidad de ahorro mensual realista, y armá la jerarquía.
-${REGLAS_JSON}
-Formato: {"diagnostico":str,"capacidad_ahorro_mensual_ars":num,"fondo_emergencia":{"objetivo_ars":num,"meses_de_gastos":num,"donde":str},"jerarquia":[{"etapa":num,"nombre":str,"objetivo":str,"instrumento_sugerido":str}],"porcentaje_recomendado":num,"aportes_ars":{"chico":num,"medio":num,"agresivo":num},"reglas_no_tocar":[str],"plan_aumento_progresivo":str,"comentario":str}`;
-    const d=await llamarClaude(prompt);
-    AGENTE_CACHE.ahorro=d;renderAhorroResult(d);
-  }catch(e){out.innerHTML=`<div style="font-family:var(--mono);font-size:10px;color:var(--warn);padding:14px">Error: ${e.message}</div>`;}
-  btn.disabled=false;btn.textContent='▶ generar plan';
-}
-function renderAhorroResult(d){
-  const out=document.getElementById('out-ahorro');if(!out||!d)return;
-  const jer=(d.jerarquia||[]).map(j=>`<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
-    <span style="font-family:var(--mono);color:var(--gold);font-size:14px;min-width:20px">${j.etapa}</span>
-    <div><b style="color:var(--hi);font-size:11px">${j.nombre}</b><div style="font-size:10px;color:var(--text)">${j.objetivo}</div><div style="font-size:10px;color:var(--dim)">→ ${j.instrumento_sugerido}</div></div></div>`).join('');
-  const reglas=(d.reglas_no_tocar||[]).map(r=>`<div style="font-size:11px;padding:3px 0">🔒 ${r}</div>`).join('');
-  out.innerHTML=`
-    <div style="padding:12px 14px;font-size:11px;border-bottom:1px solid var(--border)">${d.diagnostico||''}</div>
-    <div class="kpi-row" style="padding:14px 14px 0;margin-bottom:0">
-      <div class="kpi g"><div class="kl">Capacidad de ahorro/mes</div><div class="kv" style="font-size:16px">${ars(d.capacidad_ahorro_mensual_ars)}</div></div>
-      <div class="kpi b"><div class="kl">Fondo de emergencia</div><div class="kv" style="font-size:16px">${ars((d.fondo_emergencia||{}).objetivo_ars)}</div><div class="ks muted">${(d.fondo_emergencia||{}).meses_de_gastos||''} meses · ${(d.fondo_emergencia||{}).donde||''}</div></div>
-      <div class="kpi o"><div class="kl">% del ingreso sugerido</div><div class="kv" style="font-size:16px">${d.porcentaje_recomendado||''}%</div></div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px" class="ag-grid2">
-      <div><div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1.5px;margin-bottom:6px">JERARQUÍA DE AHORRO</div>${jer}
-        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1.5px;margin:12px 0 6px">REGLAS PARA NO TOCAR LA PLATA</div>${reglas}
-        <div style="font-size:10px;color:var(--dim);margin-top:10px">${d.plan_aumento_progresivo||''}</div></div>
-      <div><div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1.5px;margin-bottom:6px">SIMULACIÓN 24 MESES (tasa <input id="inp-tasa" type="number" value="30" style="width:44px;background:var(--surface);border:1px solid var(--border);color:var(--hi);font-family:var(--mono);font-size:10px;border-radius:4px;padding:1px 4px" onchange="drawAhorroChart()">% anual ARS)</div>
-        <div style="height:220px;position:relative"><canvas id="chart-ahorro"></canvas></div>
-        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:6px;text-align:center">Solo interés compuesto sobre aportes — vos controlás los supuestos.</div></div>
-    </div>
-    <div style="padding:0 14px 14px;font-size:11px;color:var(--text)">${d.comentario||''}</div>`;
-  drawAhorroChart();
-}
-function drawAhorroChart(){
-  const d=AGENTE_CACHE.ahorro;if(!d)return;
-  const ctx=document.getElementById('chart-ahorro');if(!ctx||!window.Chart)return;
-  const tasa=(+document.getElementById('inp-tasa')?.value||30)/100;
-  const rMes=Math.pow(1+tasa,1/12)-1;
-  const a=d.aportes_ars||{};
-  const labels=[],series={chico:[],medio:[],agresivo:[]};
-  ['chico','medio','agresivo'].forEach(k=>{let cap=0;for(let m=1;m<=24;m++){cap=cap*(1+rMes)+(a[k]||0);series[k].push(Math.round(cap));}});
-  for(let m=1;m<=24;m++)labels.push('m'+m);
-  if(chartAhorro)chartAhorro.destroy();
-  chartAhorro=new Chart(ctx,{type:'line',data:{labels,datasets:[
-    {label:`Chico (${ars(a.chico)})`,data:series.chico,borderColor:'#6b7f96',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0},
-    {label:`Medio (${ars(a.medio)})`,data:series.medio,borderColor:'#3d8fff',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0},
-    {label:`Agresivo (${ars(a.agresivo)})`,data:series.agresivo,borderColor:'#00c896',backgroundColor:'rgba(0,200,150,.06)',borderWidth:2,pointRadius:0,fill:true}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#c8d6e8',font:{size:9,family:'IBM Plex Mono'},boxWidth:12}},tooltip:{enabled:!PRIVACY}},scales:{x:{ticks:{color:'#6b7f96',font:{size:8},maxTicksLimit:8},grid:{color:'#1e2a3a'}},y:{ticks:PRIVACY?{display:false}:{color:'#6b7f96',font:{size:9},callback:v=>'$'+(v/1e6).toFixed(1)+'M'},grid:{color:'#1e2a3a'}}}}});
-}
-
-// ── Render principal del tab ──
-function renderAgente(){
-  const el=document.getElementById('tab-agente');
-  if(el.dataset.built){if(GASTOS)updateAgenteKpis();return;}
-  el.dataset.built='1';
-  const key=localStorage.getItem('agente_api_key')||'';
-  el.innerHTML=`
-  <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px">Agente financiero · análisis con IA sobre tus datos en vivo</div>
-  <div id="ag-nokey" style="display:${key?'none':'block'};background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.25);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-family:var(--mono);font-size:10px;color:var(--gold)">⚠️ Falta configurar tu API key de Anthropic para usar los análisis — bajá a ⚙️ CONFIG, pegala y guardá.</div>
-  <div class="kpi-row" id="agente-kpis">
-    <div class="kpi g"><div class="kl">Ingresos del hogar</div><div class="kv" style="font-size:16px" id="ag-ing">—</div></div>
-    <div class="kpi o"><div class="kl">Gastos del período</div><div class="kv" style="font-size:16px" id="ag-gas">—</div></div>
-    <div class="kpi b"><div class="kl">Portfolio USD</div><div class="kv" style="font-size:16px" id="ag-usd">—</div></div>
-  </div>
-  <div class="card">
-    <div style="padding:14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-      <div><b style="color:var(--hi);font-size:13px">💡 Mapa de flujos de ingresos</b><div style="font-size:10px;color:var(--dim)">7 flujos posibles + secuencia de 12 meses, sobre tu situación real</div></div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-family:var(--mono);font-size:10px;color:var(--dim)">
-        hs/semana <input id="inp-horas" type="number" value="5" style="width:50px;background:var(--surface);border:1px solid var(--border);color:var(--hi);font-family:var(--mono);border-radius:4px;padding:3px 6px">
-        capital U$D <input id="inp-capital" type="number" value="500" style="width:70px;background:var(--surface);border:1px solid var(--border);color:var(--hi);font-family:var(--mono);border-radius:4px;padding:3px 6px">
-        <button class="btn-sm" id="btn-flujos" onclick="runFlujos()" style="font-size:10px;padding:5px 14px;border-color:var(--accent);color:var(--accent)">▶ generar análisis</button>
-      </div>
-    </div>
-    <div id="out-flujos"><div style="font-family:var(--mono);font-size:10px;color:var(--dim);padding:14px">Configurá horas y capital, y dale a generar.</div></div>
-  </div>
-  <div class="card">
-    <div style="padding:14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-      <div><b style="color:var(--hi);font-size:13px">🏦 Sistema de ahorro automático</b><div style="font-size:10px;color:var(--dim)">Jerarquía de ahorro + simulación, cruzando gastos e inversiones</div></div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-family:var(--mono);font-size:10px;color:var(--dim)">
-        objetivo <select id="inp-objetivo" style="background:var(--surface);border:1px solid var(--border);color:var(--hi);font-family:var(--mono);font-size:10px;border-radius:4px;padding:3px 6px">
-          <option>Fondo de emergencia</option><option>Casa propia</option><option>Inversión a largo plazo</option><option>Viaje</option></select>
-        <button class="btn-sm" id="btn-ahorro" onclick="runAhorro()" style="font-size:10px;padding:5px 14px;border-color:var(--accent);color:var(--accent)">▶ generar plan</button>
-      </div>
-    </div>
-    <div id="out-ahorro"><div style="font-family:var(--mono);font-size:10px;color:var(--dim);padding:14px">Elegí tu objetivo principal y dale a generar.</div></div>
-  </div>
-  <div class="card" style="padding:12px 14px">
-    <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1.5px;margin-bottom:6px">⚙️ CONFIG</div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <span style="font-family:var(--mono);font-size:10px;color:var(--dim)">API key Anthropic:</span>
-      <input id="inp-apikey" type="password" value="${key}" placeholder="sk-ant-..." style="flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border);color:var(--hi);font-family:var(--mono);font-size:10px;border-radius:4px;padding:4px 8px">
-      <button class="btn-sm" onclick="localStorage.setItem('agente_api_key',document.getElementById('inp-apikey').value.trim());this.textContent='✓ guardada';const b=document.getElementById('ag-nokey');if(b)b.style.display=document.getElementById('inp-apikey').value.trim()?'none':'block'">guardar</button>
-    </div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:6px">Se guarda solo en este navegador (localStorage). Nunca la subas al repo. Los análisis son educativos, no asesoría financiera.</div>
-  </div>
-  <style>@media(max-width:760px){.ag-grid2{grid-template-columns:1fr!important}}</style>`;
-  fetchGastos().then(updateAgenteKpis).catch(()=>{
-    document.getElementById('ag-ing').textContent='sin datos';
-  });
-  if(AGENTE_CACHE.flujos)renderFlujosResult(AGENTE_CACHE.flujos);
-  if(AGENTE_CACHE.ahorro)renderAhorroResult(AGENTE_CACHE.ahorro);
-}
-function updateAgenteKpis(){
-  if(!GASTOS)return;
-  const i=document.getElementById('ag-ing');if(!i)return;
-  i.textContent=ars(GASTOS.totalI);
-  document.getElementById('ag-gas').textContent=ars(GASTOS.totalG);
-  document.getElementById('ag-usd').textContent=PRIVACY?'•••':usd(s(STATE.mine,'valor_hoy')+s(STATE.resto,'valor_a'),0);
 }
 
 // ════════ INIT ════════
