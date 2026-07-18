@@ -919,14 +919,20 @@ CONTEXTO: Vivo en Argentina, hogar de 2 adultos + 1 hijo pequeño. Sueldos en pe
 }
 
 async function llamarClaude(prompt){
-  const headers={'Content-Type':'application/json'};
   const key=localStorage.getItem('agente_api_key')||'';
-  if(key){headers['x-api-key']=key;headers['anthropic-version']='2023-06-01';headers['anthropic-dangerous-direct-browser-access']='true';}
-  const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers,body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:3000,messages:[{role:'user',content:prompt}]})});
-  if(!res.ok){const t=await res.text().catch(()=>'' );throw new Error('API '+res.status+(res.status===401?' — configurá tu API key abajo':'')+' '+t.slice(0,150));}
+  if(!key)throw new Error('Falta la API key — pegala en ⚙️ CONFIG (abajo de todo) y guardala. La sacás de console.anthropic.com → API Keys.');
+  const headers={'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'};
+  let res;
+  try{
+    res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers,body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:3000,messages:[{role:'user',content:prompt}]})});
+  }catch(e){throw new Error('No se pudo conectar con api.anthropic.com — puede ser la red (¿PC del laburo con dominios bloqueados?) o un corte de conexión.');}
+  if(res.status===401)throw new Error('API key inválida o vencida — revisala en ⚙️ CONFIG.');
+  if(res.status===429)throw new Error('Rate limit de la API — esperá un minuto y probá de nuevo.');
+  if(!res.ok){const t=await res.text().catch(()=>'');throw new Error('API '+res.status+': '+t.slice(0,150));}
   const data=await res.json();
   const txt=data.content.filter(b=>b.type==='text').map(b=>b.text).join('\n');
-  return JSON.parse(txt.replace(/```json|```/g,'').trim());
+  try{return JSON.parse(txt.replace(/```json|```/g,'').trim());}
+  catch(e){throw new Error('La respuesta no vino en JSON válido — probá generar de nuevo.');}
 }
 
 const REGLAS_JSON='Respondé ÚNICAMENTE con un objeto JSON válido, sin texto antes ni después, sin markdown, sin backticks. Enfoque educativo y de planificación: NO recomiendes comprar o vender activos específicos ni des asesoría de inversión personalizada.';
@@ -1044,6 +1050,7 @@ function renderAgente(){
   const key=localStorage.getItem('agente_api_key')||'';
   el.innerHTML=`
   <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px">Agente financiero · análisis con IA sobre tus datos en vivo</div>
+  <div id="ag-nokey" style="display:${key?'none':'block'};background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.25);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-family:var(--mono);font-size:10px;color:var(--gold)">⚠️ Falta configurar tu API key de Anthropic para usar los análisis — bajá a ⚙️ CONFIG, pegala y guardá.</div>
   <div class="kpi-row" id="agente-kpis">
     <div class="kpi g"><div class="kl">Ingresos del hogar</div><div class="kv" style="font-size:16px" id="ag-ing">—</div></div>
     <div class="kpi o"><div class="kl">Gastos del período</div><div class="kv" style="font-size:16px" id="ag-gas">—</div></div>
@@ -1076,7 +1083,7 @@ function renderAgente(){
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <span style="font-family:var(--mono);font-size:10px;color:var(--dim)">API key Anthropic:</span>
       <input id="inp-apikey" type="password" value="${key}" placeholder="sk-ant-..." style="flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border);color:var(--hi);font-family:var(--mono);font-size:10px;border-radius:4px;padding:4px 8px">
-      <button class="btn-sm" onclick="localStorage.setItem('agente_api_key',document.getElementById('inp-apikey').value.trim());this.textContent='✓ guardada'">guardar</button>
+      <button class="btn-sm" onclick="localStorage.setItem('agente_api_key',document.getElementById('inp-apikey').value.trim());this.textContent='✓ guardada';const b=document.getElementById('ag-nokey');if(b)b.style.display=document.getElementById('inp-apikey').value.trim()?'none':'block'">guardar</button>
     </div>
     <div style="font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:6px">Se guarda solo en este navegador (localStorage). Nunca la subas al repo. Los análisis son educativos, no asesoría financiera.</div>
   </div>
