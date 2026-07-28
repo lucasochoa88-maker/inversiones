@@ -147,6 +147,7 @@ input[type=range]{width:100%;accent-color:var(--blue)}
   <div class="tab" onclick="showTab('analisis')">Análisis</div>
   <div class="tab" onclick="showTab('alertas')">Alertas</div>
   <div class="tab" onclick="showTab('casa')">🏠 Casa Propia</div>
+  <div class="tab" onclick="showTab('pension')">Plan de Pensión</div>
 </div>
 
 <div id="tab-portfolio" class="tab-panel active"><div class="loading"><div class="spin">⟳</div><br>Cargando...</div></div>
@@ -154,6 +155,7 @@ input[type=range]{width:100%;accent-color:var(--blue)}
 <div id="tab-analisis" class="tab-panel"></div>
 <div id="tab-alertas" class="tab-panel"></div>
 <div id="tab-casa" class="tab-panel"></div>
+<div id="tab-pension" class="tab-panel"></div>
 
 <script>
 // ════════ PRIVACY MODE ════════
@@ -174,7 +176,7 @@ function updatePrivacyBtn(){
 let activeTab='portfolio';
 function showTab(id){
   document.querySelectorAll('.tab').forEach((t,i)=>{
-    const ids=['portfolio','evolucion','analisis','alertas','casa'];
+    const ids=['portfolio','evolucion','analisis','alertas','casa','pension'];
     t.classList.toggle('active',ids[i]===id);
   });
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -185,6 +187,7 @@ function showTab(id){
     if(id==='analisis')renderAnalisis();
     if(id==='alertas')renderAlertas();
     if(id==='casa')renderCasa();
+    if(id==='pension')renderPension();
   }
 }
 
@@ -251,6 +254,17 @@ function parseArs(txt){
   }
   return items;
 }
+function parsePension(txt){
+  const rows=parseCSV(txt),items=[];
+  for(let i=2;i<rows.length;i++){
+    const r=rows[i];if(!r)continue;
+    const quien=(r[2]||'').trim();
+    const usd_=pn(r[3]),ars_=pn(r[4]);
+    if(!quien||usd_==null)continue;
+    items.push({quien,tipo:(r[1]||'').trim(),usd:usd_,ars:ars_||0});
+  }
+  return items;
+}
 async function fetchSheet(sheet){
   if(!SCRIPT_URL)throw new Error('sin_url');
   const res=await fetch(`${SCRIPT_URL}?sheet=${sheet}`,{signal:AbortSignal.timeout(12000)});
@@ -311,6 +325,10 @@ const FALLBACK={
   ars:[
     {fecha:"2-ene-2026",cat:"Acción",broker:"Santander",activo:"YPFD",cant:3,valor_c:166350,valor_a:211800,pl:45450,pl_pct:21.46},
   ],
+  pension:[
+    {quien:"Lucas",tipo:"Plan de Pensión",usd:1595.99,ars:2215236},
+    {quien:"Mariana",tipo:"Plan de Pensión",usd:6982.94,ars:9692332},
+  ],
 };
 let STATE={...FALLBACK,source:'empty'};
 
@@ -318,9 +336,9 @@ async function loadAll(){
   setStatus('cargando...','warn');
   document.getElementById('tab-portfolio').innerHTML='<div class="loading"><div class="spin">⟳</div><br>Actualizando...</div>';
   try{
-    const [csvCed,csvResto,csvArs]=await Promise.all([fetchSheet('cedears'),fetchSheet('resto'),fetchSheet('ars')]);
+    const [csvCed,csvResto,csvArs,csvPen]=await Promise.all([fetchSheet('cedears'),fetchSheet('resto'),fetchSheet('ars'),fetchSheet('pension')]);
     const ced=parseCedears(csvCed);
-    STATE={mine:ced.mine,ali:ced.ali,cartera:ced.cartera,totales:ced.totales,resto:parseResto(csvResto),ars:parseArs(csvArs),source:'live'};
+    STATE={mine:ced.mine,ali:ced.ali,cartera:ced.cartera,totales:ced.totales,resto:parseResto(csvResto),ars:parseArs(csvArs),pension:parsePension(csvPen),source:'live'};
     setStatus('en vivo','live');
     document.getElementById('sync-time').textContent='actualizado '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
   }catch(e){
@@ -340,6 +358,7 @@ function renderAll(){
   if(activeTab==='analisis')renderAnalisis();
   if(activeTab==='alertas')renderAlertas();
   if(activeTab==='casa')renderCasa();
+  if(activeTab==='pension')renderPension();
 }
 
 // ════════ UTILS ════════
@@ -397,8 +416,9 @@ function renderPortfolio(){
   const arsArr=ars||[],arsTC=s(arsArr,'valor_c'),arsTA=s(arsArr,'valor_a');
   const COLORS={IOL:'#00c896',Santander:'#ff6b4a',Nexo:'#3d8fff','Ualá':'#f0b429'};
 
+  const penArr=STATE.pension||[], penUSD=s(penArr,'usd');
   const kpis=`<div class="kpi-row">
-    <div class="kpi b"><div class="kl">Total portfolio (sin Ali)</div><div class="kv">${usd(mTA+resTA,0)}</div><div class="ks ${pc((mTA+resTA)-(mTC+resTC))}">${usd((mTA+resTA)-(mTC+resTC))} · ${pct(((mTA+resTA)-(mTC+resTC))/(mTC+resTC)*100)}</div></div>
+    <div class="kpi b"><div class="kl">Total portfolio (sin Ali)</div><div class="kv">${usd(mTA+resTA+penUSD,0)}</div><div class="ks ${pc((mTA+resTA)-(mTC+resTC))}">${usd((mTA+resTA)-(mTC+resTC))} · ${pct(((mTA+resTA)-(mTC+resTC))/(mTC+resTC)*100)} <span class="muted">· incl. pensión</span></div></div>
     <div class="kpi g"><div class="kl">CEDEARs</div><div class="kv">${usd(cedTA,0)}</div><div class="ks ${pc(cedTA-cedTC)}">${usd(cedTA-cedTC)} · ${pct((cedTA-cedTC)/cedTC*100)}</div></div>
     <div class="kpi o"><div class="kl">Nexo · Ualá · FCI</div><div class="kv">${usd(resTA,0)}</div><div class="ks muted">valor actual</div></div>
     <div class="kpi p"><div class="kl">Ali 👶🏻</div><div class="kv" style="color:var(--ali)">${usd(aTA,0)}</div><div class="ks ${pc(aTA-aTC)}">${usd(aTA-aTC)} · ${pct((aTA-aTC)/aTC*100)}</div></div>
@@ -452,7 +472,7 @@ function renderPortfolio(){
       </div>
       <div class="card ali" style="margin-bottom:0"><div class="ch"><span class="ct">Ali 👶🏻</span><span class="badge bp">${usd(aTA,0)}</span></div>
         <div style="background:var(--ali-dim);border:1px solid var(--ali-bd);border-radius:8px;margin:12px 14px;padding:10px 14px;display:flex;align-items:center;gap:12px">
-          <div style="font-size:22px">👶🏻</div><div style="flex:1"><div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ali)">Alaia · 2 años · SPY largo plazo</div></div>
+          <div style="font-size:22px">👶🏻</div><div style="flex:1"><div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ali)">Alianza · 2 años · SPY largo plazo</div></div>
           <div style="font-family:var(--mono);text-align:right"><span style="color:var(--dim);font-size:9px">ganancia</span><div class="pos" style="font-size:16px;font-weight:600">${usd(aPL)}</div><div style="font-size:10px" class="${pc(aPL)}">${pct(aPL/aTC*100)}</div></div>
         </div>
         <div style="padding:0 14px 12px;overflow-x:auto"><table><thead><tr><th>Fecha</th><th class="r">Compra</th><th class="r">Actual</th><th class="r">Var</th></tr></thead><tbody>${rowsAli}</tbody>
@@ -859,6 +879,44 @@ function updateCalc(){
       <div style="background:var(--surface);border-radius:8px;padding:12px"><div style="font-family:var(--mono);font-size:9px;color:var(--dim)">FECHA ESTIMADA</div><div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--hi)">${fecha.toLocaleDateString('es-AR',{month:'short',year:'numeric'})}</div></div>
     </div>
     <div style="margin-top:10px;font-family:var(--mono);font-size:9px;color:var(--dim);text-align:center">Vos controlás los números — esto solo hace la cuenta compuesta.</div>`;
+}
+
+// ════════ TAB 6: PLAN DE PENSIÓN ════════
+function renderPension(){
+  const pen=STATE.pension||[];
+  if(!pen.length){document.getElementById('tab-pension').innerHTML='<div class="loading">Sin datos de pensión.</div>';return;}
+  const totUSD=s(pen,'usd'),totARS=s(pen,'ars');
+  const COLORS_P=['#3d8fff','#c084fc','#00c896','#f0b429'];
+  const maxP=Math.max(...pen.map(p=>p.usd));
+
+  const rows=pen.map((p,i)=>`<tr>
+    <td><span class="tk">${p.quien}</span></td>
+    <td><span class="tag">${p.tipo}</span></td>
+    <td class="r">${usd(p.usd)}</td>
+    <td class="r muted">${arsFmt(p.ars)}</td>
+    <td class="r"><span class="badge bb">${pct(p.usd/totUSD*100)}</span></td>
+  </tr>`).join('');
+
+  const bars=pen.map((p,i)=>`<div class="bar-row">
+    <span class="bar-lbl">${p.quien}</span>
+    <div class="bar-track"><div class="bar-fill" style="width:${p.usd/maxP*100}%;background:${COLORS_P[i%COLORS_P.length]}"></div><span class="bar-val">${usd(p.usd,0)}</span></div>
+    <span class="bar-pct muted">${pct(p.usd/totUSD*100)}</span>
+  </div>`).join('');
+
+  document.getElementById('tab-pension').innerHTML=`
+    <div class="kpi-row">
+      <div class="kpi b"><div class="kl">Total pensión USD</div><div class="kv">${usd(totUSD,0)}</div><div class="ks muted">suma al total portfolio</div></div>
+      <div class="kpi o"><div class="kl">Total pensión ARS</div><div class="kv" style="font-size:16px">${arsFmt(totARS)}</div><div class="ks muted">valor en pesos</div></div>
+      <div class="kpi g"><div class="kl">Aportantes</div><div class="kv">${pen.length}</div><div class="ks muted">${pen.map(p=>p.quien).join(' · ')}</div></div>
+    </div>
+    <div class="notice-blue">ℹ️ Fondo de retiro de largo plazo. Se suma al "Total portfolio (sin Ali)" pero <strong>no</strong> cuenta para el objetivo Casa Propia — es plata con otro destino.</div>
+    <div class="g2">
+      <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Detalle</span><span class="badge bb">${pen.length} planes</span></div>
+        <div style="padding:0 14px 12px;overflow-x:auto"><table><thead><tr><th>Quién</th><th>Tipo</th><th class="r">USD</th><th class="r">ARS</th><th class="r">Peso</th></tr></thead><tbody>${rows}</tbody>
+        <tfoot><tr style="border-top:1px solid var(--border)"><td colspan="2" class="muted" style="padding-top:8px">Total</td><td class="r" style="padding-top:8px">${usd(totUSD)}</td><td class="r muted" style="padding-top:8px">${arsFmt(totARS)}</td><td class="r" style="padding-top:8px">100%</td></tr></tfoot></table></div>
+      </div>
+      <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Distribución</span></div><div class="cb">${bars}</div></div>
+    </div>`;
 }
 
 // ════════ INIT ════════
