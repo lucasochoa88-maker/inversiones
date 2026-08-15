@@ -236,11 +236,11 @@ function parseResto(txt){
   const rows=parseCSV(txt),items=[];
   for(let i=2;i<rows.length;i++){
     const r=rows[i];if(!r||!r[0]||!r[0].trim())continue;
-    if((r[1]||'').trim()==='Venta')continue;
+    const esVenta=(r[1]||'').trim()==='Venta';
     const vc=pn(r[7]),va=pn(r[8]),pl=pn(r[9]),plp=pn(r[10]);
-    if(!va)continue;
-    const pl_ok=plp!=null&&!(pl===0&&vc===va);
-    items.push({fecha:(r[0]||'').trim(),cat:(r[2]||'').trim(),broker:(r[3]||'').trim(),activo:(r[4]||'').trim(),valor_c:vc||0,valor_a:va,pl:pl||0,pl_pct:plp,pl_ok});
+    if(va==null||va===0)continue;
+    const pl_ok=!esVenta&&plp!=null&&!(pl===0&&vc===va);
+    items.push({fecha:(r[0]||'').trim(),cat:(r[2]||'').trim(),broker:(r[3]||'').trim(),activo:(r[4]||'').trim(),valor_c:vc||0,valor_a:va,pl:esVenta?0:(pl||0),pl_pct:esVenta?null:plp,pl_ok,esVenta});
   }
   return items;
 }
@@ -481,7 +481,7 @@ function renderPortfolio(){
     </div>`;
 
   const noOk=resto.filter(r=>!r.pl_ok).length;
-  const rowsResto=resto.map(r=>{const hasPL=r.pl_ok&&r.pl_pct!=null;const bc=!hasPL?'bw':r.pl>=0?'bg':'br';const plCell=hasPL?`<span class="badge ${bc}">${pct(r.pl_pct)}</span>`:`<span class="badge bw">⚠️ n/d</span>`;return`<tr><td><span class="tk">${r.activo}</span></td><td><span class="tag">${r.broker}</span></td><td><span class="tag">${r.cat}</span></td><td class="r" style="color:var(--dim);font-size:10px">${r.fecha}</td><td class="r">${usd(r.valor_c)}</td><td class="r">${usd(r.valor_a)}</td><td class="r">${plCell}</td></tr>`;}).join('');
+  const rowsResto=resto.map(r=>{const hasPL=r.pl_ok&&r.pl_pct!=null;const bc=!hasPL?'bw':r.pl>=0?'bg':'br';const plCell=r.esVenta?`<span class="badge bo">venta</span>`:hasPL?`<span class="badge ${bc}">${pct(r.pl_pct)}</span>`:`<span class="badge bw">⚠️ n/d</span>`;const rowStyle=r.esVenta?' style="opacity:.6"':'';return`<tr${rowStyle}><td><span class="tk">${r.activo}</span></td><td><span class="tag">${r.broker}</span></td><td><span class="tag">${r.esVenta?'Venta':r.cat}</span></td><td class="r" style="color:var(--dim);font-size:10px">${r.fecha}</td><td class="r">${usd(r.valor_c)}</td><td class="r">${usd(r.valor_a)}</td><td class="r">${plCell}</td></tr>`;}).join('');
   const bm2={};resto.forEach(r=>{if(!bm2[r.broker])bm2[r.broker]={c:0,a:0};bm2[r.broker].c+=r.valor_c;bm2[r.broker].a+=r.valor_a;});
   const bArr2=Object.entries(bm2).sort((a,b)=>b[1].a-a[1].a);
   const maxB2=bArr2[0]?bArr2[0][1].a:1;
@@ -573,7 +573,7 @@ function renderAnalisis(){
   // ── Waterfall P&L por activo ──
   const plMap={};
   allUSD.forEach(o=>{const k=o.ticker;if(!plMap[k])plMap[k]=0;plMap[k]+=(o.valor_hoy||0)-(o.valor_c||0);});
-  resto.forEach(r=>{if(!r.pl_ok)return;const k=r.activo;if(!plMap[k])plMap[k]=0;plMap[k]+=r.pl||0;});
+  resto.forEach(r=>{if(!r.pl_ok||r.esVenta)return;const k=r.activo;if(!plMap[k])plMap[k]=0;plMap[k]+=r.pl||0;});
   const plArr=Object.entries(plMap).sort((a,b)=>b[1]-a[1]);
 
   // ── CAGR + vs SPY por lote ──
