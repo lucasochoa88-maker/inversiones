@@ -148,6 +148,7 @@ input[type=range]{width:100%;accent-color:var(--blue)}
   <div class="tab" onclick="showTab('alertas')">Alertas</div>
   <div class="tab" onclick="showTab('casa')">🏠 Casa Propia</div>
   <div class="tab" onclick="showTab('pension')">Plan de Pensión</div>
+  <div class="tab" onclick="showTab('garra')">🕹️ Garra</div>
 </div>
 
 <div id="tab-portfolio" class="tab-panel active"><div class="loading"><div class="spin">⟳</div><br>Cargando...</div></div>
@@ -156,6 +157,7 @@ input[type=range]{width:100%;accent-color:var(--blue)}
 <div id="tab-alertas" class="tab-panel"></div>
 <div id="tab-casa" class="tab-panel"></div>
 <div id="tab-pension" class="tab-panel"></div>
+<div id="tab-garra" class="tab-panel"></div>
 
 <script>
 // ════════ PRIVACY MODE ════════
@@ -176,7 +178,7 @@ function updatePrivacyBtn(){
 let activeTab='portfolio';
 function showTab(id){
   document.querySelectorAll('.tab').forEach((t,i)=>{
-    const ids=['portfolio','evolucion','analisis','alertas','casa','pension'];
+    const ids=['portfolio','evolucion','analisis','alertas','casa','pension','garra'];
     t.classList.toggle('active',ids[i]===id);
   });
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -188,6 +190,7 @@ function showTab(id){
     if(id==='alertas')renderAlertas();
     if(id==='casa')renderCasa();
     if(id==='pension')renderPension();
+    if(id==='garra')renderGarra();
   }
 }
 
@@ -265,6 +268,25 @@ function parsePension(txt){
   }
   return items;
 }
+function parseGarra(txt){
+  const rows=parseCSV(txt);
+  let totalARS=null,equivUSD=null,eventos=[];
+  for(let i=0;i<rows.length;i++){
+    const r=rows[i];if(!r)continue;
+    const label=(r[1]||'').trim().toLowerCase();
+    if(label==='total ars')totalARS=pn(r[2]);
+    if(label==='equivalente usd')equivUSD=pn(r[2]);
+    // filas de eventos: col1=numero, col2=ganancia, bajo la seccion ROI
+    const n=pn(r[1]),g=pn(r[2]);
+    if(n!=null&&g!=null&&n>=1&&n<=200&&label!=='total ars'&&label!=='equivalente usd'){
+      eventos.push({num:n,ganancia:g});
+    }
+  }
+  // dedup por numero de evento, quedarse con el ultimo
+  const map={};eventos.forEach(e=>{map[e.num]=e.ganancia;});
+  const evArr=Object.entries(map).map(([n,g])=>({num:+n,ganancia:g})).sort((a,b)=>a.num-b.num);
+  return{totalARS:totalARS||0,equivUSD:equivUSD||0,eventos:evArr};
+}
 async function fetchSheet(sheet){
   if(!SCRIPT_URL)throw new Error('sin_url');
   const res=await fetch(`${SCRIPT_URL}?sheet=${sheet}`,{signal:AbortSignal.timeout(12000)});
@@ -329,6 +351,7 @@ const FALLBACK={
     {quien:"Lucas",tipo:"Plan de Pensión",usd:1595.99,ars:2215236},
     {quien:"Mariana",tipo:"Plan de Pensión",usd:6982.94,ars:9692332},
   ],
+  garra:{totalARS:1854000,equivUSD:1100,eventos:[{num:1,ganancia:102000}]},
 };
 let STATE={...FALLBACK,source:'empty'};
 
@@ -336,9 +359,9 @@ async function loadAll(){
   setStatus('cargando...','warn');
   document.getElementById('tab-portfolio').innerHTML='<div class="loading"><div class="spin">⟳</div><br>Actualizando...</div>';
   try{
-    const [csvCed,csvResto,csvArs,csvPen]=await Promise.all([fetchSheet('cedears'),fetchSheet('resto'),fetchSheet('ars'),fetchSheet('pension')]);
+    const [csvCed,csvResto,csvArs,csvPen,csvGarra]=await Promise.all([fetchSheet('cedears'),fetchSheet('resto'),fetchSheet('ars'),fetchSheet('pension'),fetchSheet('garra')]);
     const ced=parseCedears(csvCed);
-    STATE={mine:ced.mine,ali:ced.ali,cartera:ced.cartera,totales:ced.totales,resto:parseResto(csvResto),ars:parseArs(csvArs),pension:parsePension(csvPen),source:'live'};
+    STATE={mine:ced.mine,ali:ced.ali,cartera:ced.cartera,totales:ced.totales,resto:parseResto(csvResto),ars:parseArs(csvArs),pension:parsePension(csvPen),garra:parseGarra(csvGarra),source:'live'};
     setStatus('en vivo','live');
     document.getElementById('sync-time').textContent='actualizado '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
   }catch(e){
@@ -359,6 +382,7 @@ function renderAll(){
   if(activeTab==='alertas')renderAlertas();
   if(activeTab==='casa')renderCasa();
   if(activeTab==='pension')renderPension();
+  if(activeTab==='garra')renderGarra();
 }
 
 // ════════ UTILS ════════
@@ -920,6 +944,129 @@ function renderPension(){
       </div>
       <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Distribución</span></div><div class="cb">${bars}</div></div>
     </div>`;
+}
+
+// ════════ TAB 7: GARRA 🕹️ ════════
+function renderGarra(){
+  const g=STATE.garra||{totalARS:0,equivUSD:0,eventos:[]};
+  const inv=g.totalARS, evs=g.eventos||[];
+  const recuperado=evs.reduce((s,e)=>s+e.ganancia,0);
+  const nEventos=evs.length;
+  const gananciaProm=nEventos>0?recuperado/nEventos:0;
+  const pctRecup=inv>0?Math.min(recuperado/inv*100,100):0;
+  const falta=Math.max(inv-recuperado,0);
+  const recuperado_ya=recuperado>=inv;
+  const eventosParaBE=gananciaProm>0?Math.ceil(inv/gananciaProm):null;
+  const eventosRestantes=gananciaProm>0?Math.max(Math.ceil(falta/gananciaProm),0):null;
+  const gananciaNeta=Math.max(recuperado-inv,0);
+
+  const fmtArs=n=>PRIVACY?'$ •••':'$ '+Math.round(n).toLocaleString('es-AR');
+  const color=recuperado_ya?'#00c896':pctRecup>=66?'#00c896':pctRecup>=33?'#f0b429':'#ff6b4a';
+
+  // ── Pista de carrera ──
+  // posiciones de la garra y la meta
+  const garraPos=pctRecup; // %
+  const trackH=`
+    <div style="position:relative;margin:30px 0 10px;height:90px">
+      <!-- pista -->
+      <div style="position:absolute;top:48px;left:0;right:0;height:8px;background:#1e2a3a;border-radius:4px"></div>
+      <!-- avance -->
+      <div style="position:absolute;top:48px;left:0;height:8px;width:${garraPos}%;background:linear-gradient(to right,${color}88,${color});border-radius:4px;transition:width 1s ease"></div>
+      <!-- garra que avanza -->
+      <div style="position:absolute;top:20px;left:calc(${garraPos}% - 16px);transition:left 1s ease;text-align:center;width:32px">
+        <div style="font-size:26px;line-height:1">🕹️</div>
+      </div>
+      <!-- meta -->
+      <div style="position:absolute;top:14px;right:-6px;text-align:center;width:40px">
+        <div style="font-size:24px;line-height:1">🏁</div>
+        <div style="font-family:var(--mono);font-size:8px;color:var(--dim);margin-top:2px">META</div>
+      </div>
+      <!-- inicio -->
+      <div style="position:absolute;top:62px;left:0;font-family:var(--mono);font-size:8px;color:var(--dim)">$0</div>
+      <div style="position:absolute;top:62px;right:0;font-family:var(--mono);font-size:8px;color:var(--dim)">${fmtArs(inv)}</div>
+    </div>`;
+
+  // ── Grilla de eventos (hitos hasta break-even) ──
+  const totalHitos=eventosParaBE||18;
+  let hitosH='';
+  for(let i=1;i<=Math.max(totalHitos,nEventos);i++){
+    const done=i<=nEventos;
+    const esGanancia=eventosParaBE&&i>eventosParaBE;
+    const bgc=done?(esGanancia?'#00c896':'#f0b429'):'#1e2a3a';
+    const brd=done?(esGanancia?'#00c896':'#f0b429'):'#1e2a3a';
+    hitosH+=`<div title="Evento ${i}${done?': '+fmtArs(evs[i-1]?evs[i-1].ganancia:gananciaProm):''}" style="width:26px;height:26px;border-radius:6px;border:1.5px solid ${brd};background:${done?bgc+'33':'transparent'};display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;color:${done?bgc:'var(--dim)'};font-weight:600">${done?'✓':i}</div>`;
+  }
+
+  // ── Proyección por ritmo ──
+  const ritmos=[1,2,4];
+  const proyH=ritmos.map(r=>{
+    if(!eventosRestantes)return '';
+    const meses=Math.ceil(eventosRestantes/r);
+    const fecha=new Date();fecha.setMonth(fecha.getMonth()+meses);
+    return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;flex:1;min-width:100px">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--dim)">${r} EVENTO${r>1?'S':''}/MES</div>
+      <div style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--hi);margin:4px 0">${meses} ${meses===1?'mes':'meses'}</div>
+      <div style="font-family:var(--mono);font-size:9px;color:${color}">${fecha.toLocaleDateString('es-AR',{month:'short',year:'2-digit'})}</div>
+    </div>`;
+  }).join('');
+
+  // ── Tabla de eventos ──
+  const rowsEv=evs.map((e,i)=>{
+    const acum=evs.slice(0,i+1).reduce((s,x)=>s+x.ganancia,0);
+    const pctAcum=inv>0?acum/inv*100:0;
+    return`<tr><td><span class="tk">Evento ${e.num}</span></td><td class="r">${fmtArs(e.ganancia)}</td><td class="r muted">${fmtArs(acum)}</td><td class="r"><span class="badge ${pctAcum>=100?'bg':'bo'}">${pctAcum.toFixed(1)}%</span></td></tr>`;
+  }).join('');
+
+  document.getElementById('tab-garra').innerHTML=`
+    <div class="kpi-row">
+      <div class="kpi" style="border-color:rgba(255,107,74,.3)"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--warn)"></div><div class="kl">Mi inversión</div><div class="kv" style="font-size:17px">${fmtArs(inv)}</div><div class="ks muted">≈ ${usd(g.equivUSD)} · mi mitad</div></div>
+      <div class="kpi g"><div class="kl">Recuperado</div><div class="kv" style="font-size:17px">${fmtArs(recuperado)}</div><div class="ks ${recuperado_ya?'pos':'muted'}">${pctRecup.toFixed(1)}% del capital</div></div>
+      <div class="kpi o"><div class="kl">Eventos para recuperar</div><div class="kv">${recuperado_ya?'✅':eventosRestantes!=null?eventosRestantes:'—'}</div><div class="ks muted">${recuperado_ya?'ya recuperaste':'faltan a este ritmo'}</div></div>
+      <div class="kpi b"><div class="kl">Ganancia por evento</div><div class="kv" style="font-size:17px">${fmtArs(gananciaProm)}</div><div class="ks muted">promedio · ${nEventos} evento${nEventos!==1?'s':''}</div></div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><span class="ct">🏁 Carrera hasta recuperar la inversión</span><span class="badge ${recuperado_ya?'bg':'bo'}">${pctRecup.toFixed(1)}%</span></div>
+      <div class="cb">
+        ${trackH}
+        <div style="text-align:center;font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:8px">
+          ${recuperado_ya
+            ?`<span style="color:#00c896;font-weight:600">🎉 ¡Inversión recuperada! Ganancia neta: ${fmtArs(gananciaNeta)}</span>`
+            :`Faltan <span style="color:var(--hi);font-weight:600">${fmtArs(falta)}</span> — a ${fmtArs(gananciaProm)} por evento, <span style="color:${color};font-weight:600">${eventosRestantes} evento${eventosRestantes!==1?'s':''} más</span>`
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><span class="ct">Eventos · fase recupero 🟡 → fase ganancia 🟢</span><span class="badge bb">${nEventos}/${eventosParaBE||'?'} para break-even</span></div>
+      <div class="cb">
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">${hitosH}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);line-height:1.7">
+          🟡 Amarillo = evento que recupera capital · 🟢 Verde = evento de ganancia limpia (después del #${eventosParaBE||'?'}) · ⬜ Gris = pendiente
+        </div>
+      </div>
+    </div>
+
+    <div class="g2">
+      <div class="card" style="margin-bottom:0">
+        <div class="ch"><span class="ct">¿Cuándo recuperás? · según ritmo</span></div>
+        <div class="cb">
+          ${recuperado_ya?'<div style="text-align:center;padding:16px;color:#00c896;font-family:var(--mono);font-size:12px">✅ Ya recuperaste tu inversión</div>':`<div style="display:flex;gap:10px;flex-wrap:wrap">${proyH}</div>
+          <div style="margin-top:10px;font-family:var(--mono);font-size:9px;color:var(--dim);text-align:center">Estimado con ganancia promedio de ${fmtArs(gananciaProm)} por evento.</div>`}
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div class="ch"><span class="ct">Historial de eventos</span><span class="badge bo">${nEventos}</span></div>
+        <div style="padding:0 14px 12px;overflow-x:auto">
+          <table><thead><tr><th>Evento</th><th class="r">Ganancia</th><th class="r">Acumulado</th><th class="r">% recup.</th></tr></thead>
+          <tbody>${rowsEv||'<tr><td colspan="4" class="muted" style="text-align:center;padding:16px">Sin eventos aún</td></tr>'}</tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <div class="notice-blue">🕹️ <strong>Garra</strong> — máquina de peluches para cumpleaños y eventos empresariales. Sociedad al 50% con tu socio. Los montos son tu mitad: inversión y ganancias ya divididas.</div>
+  `;
 }
 
 // ════════ INIT ════════
