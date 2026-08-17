@@ -486,16 +486,44 @@ function renderPortfolio(){
   }).join('');
 
   const mPL=mTA-mTC,aPL=aTA-aTC;
+
+  // Consolidar Mis lotes por ticker+broker → costo promedio y modo colapsado
+  const loteMap={};
+  mine.forEach(o=>{
+    const k=o.ticker+'|'+o.broker;
+    if(!loteMap[k])loteMap[k]={ticker:o.ticker,broker:o.broker,valor_c:0,valor_hoy:0,n:0};
+    loteMap[k].valor_c+=o.valor_c||0;
+    loteMap[k].valor_hoy+=o.valor_hoy||0;
+    loteMap[k].n++;
+  });
+  const lotesConsol=Object.values(loteMap).sort((a,b)=>b.valor_hoy-a.valor_hoy);
+
+  const modoLotes=window._modoLotes||'colapsado';
+
+  const rowsConsol=lotesConsol.map(l=>{
+    const p=l.valor_c>0?(l.valor_hoy/l.valor_c-1)*100:0;
+    const bc=p>=15?'bg':p>=0?'bb':p>=-10?'bo':'br';
+    const nTag=l.n>1?` <span class="tag">${l.n} lotes</span>`:'';
+    return`<tr><td><span class="tk">${l.ticker}</span>${nTag}</td><td><span class="tag">${l.broker}</span></td><td class="r">${usd(l.valor_c)}</td><td class="r">${usd(l.valor_hoy)}</td><td class="r"><span class="badge ${bc}">${pct(p)}</span></td></tr>`;
+  }).join('');
+
   const rowsMine=mine.map(o=>{const p=o.var_pct||0;const bc=p>=15?'bg':p>=0?'bb':p>=-10?'bo':'br';return`<tr><td><span class="tk">${o.ticker}</span></td><td><span class="tag">${o.broker}</span></td><td class="r" style="color:var(--dim);font-size:10px">${o.fecha_c}</td><td class="r">${usd(o.valor_c)}</td><td class="r">${usd(o.valor_hoy)}</td><td class="r"><span class="badge ${bc}">${pct(p)}</span></td></tr>`;}).join('');
   const rowsAli=ali.map(o=>{const p=o.var_pct||0;return`<tr><td><span class="tk">${o.ticker}</span></td><td class="r" style="color:var(--dim);font-size:10px">${o.fecha_c}</td><td class="r">${usd(o.valor_c)}</td><td class="r">${usd(o.valor_hoy)}</td><td class="r"><span class="badge ${p>=0?'bg':'br'}">${pct(p)}</span></td></tr>`;}).join('');
+
+  const toggleBtn=`<span style="cursor:pointer;font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:4px;border:1px solid var(--border);background:var(--surface);color:var(--dim)" onclick="window._modoLotes='${modoLotes==='colapsado'?'expandido':'colapsado'}';renderPortfolio()">${modoLotes==='colapsado'?'⊕ ver lotes':'⊖ consolidar'}</span>`;
+
+  const tablaLotes=modoLotes==='colapsado'
+    ?`<table><thead><tr><th>Ticker</th><th>Broker</th><th class="r">Invertido</th><th class="r">Actual</th><th class="r">P&L</th></tr></thead><tbody>${rowsConsol}</tbody>
+      <tfoot><tr style="border-top:1px solid var(--border)"><td colspan="2" class="muted" style="padding-top:8px">Subtotal</td><td class="r muted" style="padding-top:8px">${usd(mTC)}</td><td class="r" style="padding-top:8px">${usd(mTA)}</td><td class="r ${pc(mPL)}" style="padding-top:8px">${pct(mPL/mTC*100)}</td></tr></tfoot></table>`
+    :`<table><thead><tr><th>Ticker</th><th>Broker</th><th class="r">Fecha</th><th class="r">Compra</th><th class="r">Actual</th><th class="r">Var</th></tr></thead><tbody>${rowsMine}</tbody>
+      <tfoot><tr style="border-top:1px solid var(--border)"><td colspan="3" class="muted" style="padding-top:8px">Subtotal</td><td class="r muted" style="padding-top:8px">${usd(mTC)}</td><td class="r" style="padding-top:8px">${usd(mTA)}</td><td class="r ${pc(mPL)}" style="padding-top:8px">${pct(mPL/mTC*100)}</td></tr></tfoot></table>`;
 
   const cedSec=`
     <div class="sec"><span class="sec-lbl" style="color:var(--accent)">▸ CEDEARs</span><div class="sec-line" style="background:linear-gradient(to right,rgba(0,200,150,.4),transparent)"></div><span class="sec-tag" style="background:rgba(0,200,150,.1);color:var(--accent);border:1px solid rgba(0,200,150,.2)">${usd(cedTA,0)} · ${pct((cedTA-cedTC)/cedTC*100)}</span></div>
     <div class="card"><div class="ch"><span class="ct">Heatmap por ticker</span><span class="badge bb">P&L por ticker</span></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;padding:14px 16px">${heatH}</div></div>
     <div class="g2">
-      <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Mis lotes</span><span class="badge bg">${usd(mTA,0)} · <span class="${pc(mPL)}">${pct(mPL/mTC*100)}</span></span></div>
-        <div style="padding:0 14px 12px;overflow-x:auto"><table><thead><tr><th>Ticker</th><th>Broker</th><th class="r">Fecha</th><th class="r">Compra</th><th class="r">Actual</th><th class="r">Var</th></tr></thead><tbody>${rowsMine}</tbody>
-        <tfoot><tr style="border-top:1px solid var(--border)"><td colspan="3" class="muted" style="padding-top:8px">Subtotal</td><td class="r muted" style="padding-top:8px">${usd(mTC)}</td><td class="r" style="padding-top:8px">${usd(mTA)}</td><td class="r ${pc(mPL)}" style="padding-top:8px">${pct(mPL/mTC*100)}</td></tr></tfoot></table></div>
+      <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Mis lotes</span><div style="display:flex;gap:8px;align-items:center">${toggleBtn}<span class="badge bg">${usd(mTA,0)} · <span class="${pc(mPL)}">${pct(mPL/mTC*100)}</span></span></div></div>
+        <div style="padding:0 14px 12px;overflow-x:auto">${tablaLotes}</div>
       </div>
       <div class="card ali" style="margin-bottom:0"><div class="ch"><span class="ct">Ali 👶🏻</span><span class="badge bp">${usd(aTA,0)}</span></div>
         <div style="background:var(--ali-dim);border:1px solid var(--ali-bd);border-radius:8px;margin:12px 14px;padding:10px 14px;display:flex;align-items:center;gap:12px">
@@ -560,7 +588,29 @@ function renderPortfolio(){
       <tfoot><tr style="border-top:1px solid var(--border)"><td colspan="5" class="muted" style="padding-top:8px">Total ARS</td><td class="r muted" style="padding-top:8px">${arsFmt(arsTC)}</td><td class="r" style="padding-top:8px">${arsFmt(arsTA)}</td><td class="r ${pc(arsTA-arsTC)}" style="padding-top:8px">${pct((arsTA-arsTC)/arsTC*100)}</td></tr></tfoot></table></div>
     </div>`);
 
-  document.getElementById('tab-portfolio').innerHTML=kpis+overview+cedSec+restoSec+arsSec;
+  // ── Realized vs Unrealized P&L ──
+  const unrealMine=mine.reduce((s,o)=>s+((o.valor_hoy||0)-(o.valor_c||0)),0);
+  const unrealResto=resto.filter(r=>r.pl_ok&&!r.esVenta).reduce((s,r)=>s+(r.pl||0),0);
+  const unrealTotal=unrealMine+unrealResto;
+  const totalVendido=resto.filter(r=>r.esVenta).reduce((s,r)=>s+Math.abs(r.valor_a),0);
+  const plSec=`
+    <div class="sec"><span class="sec-lbl" style="color:var(--gold)">▸ Resultado</span><div class="sec-line" style="background:linear-gradient(to right,rgba(240,180,41,.4),transparent)"></div></div>
+    <div class="g2">
+      <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">P&L no realizado</span><span class="badge bb">sobre el papel</span></div>
+        <div class="cb" style="display:flex;align-items:center;gap:14px">
+          <div style="font-family:var(--mono);font-size:24px;font-weight:600" class="${pc(unrealTotal)}">${usd(unrealTotal)}</div>
+          <div style="font-size:11px;color:var(--dim);line-height:1.5">Ganancia/pérdida de lo que <strong>tenés hoy</strong>. Todavía no la embolsaste — sube y baja con el mercado.</div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Capital retirado</span><span class="badge bo">realizado</span></div>
+        <div class="cb" style="display:flex;align-items:center;gap:14px">
+          <div style="font-family:var(--mono);font-size:24px;font-weight:600;color:var(--gold)">${usd(totalVendido)}</div>
+          <div style="font-size:11px;color:var(--dim);line-height:1.5">Total que <strong>vendiste/retiraste</strong> y salió del portfolio. ${totalVendido>0?'Sin precio de compra registrado, se muestra como capital movido, no como ganancia.':'Aún no registraste ventas.'}</div>
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById('tab-portfolio').innerHTML=kpis+overview+cedSec+restoSec+arsSec+plSec;
 }
 
 // ════════ TAB 2: EVOLUCIÓN ════════
