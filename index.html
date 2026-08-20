@@ -271,6 +271,23 @@ function parsePension(txt){
   }
   return items;
 }
+function parseMovs(txt){
+  const rows=parseCSV(txt),items=[];
+  for(let i=1;i<rows.length;i++){
+    const r=rows[i];if(!r||!r[0]||!r[0].trim())continue;
+    const fecha=(r[0]||'').trim();
+    const tipo=(r[1]||'').trim();
+    const activo=(r[2]||'').trim();
+    if(!activo)continue;
+    const cant=pn(r[4]), precio=pn(r[5]);
+    let total=pn(r[6]);
+    if(total==null||isNaN(total)){ // si la celda tiene #VALUE! u otra cosa, calcularlo
+      total=(cant!=null&&precio!=null)?cant*precio:null;
+    }
+    items.push({fecha,tipo,activo,broker:(r[3]||'').trim(),cant,precio,total,notas:(r[7]||'').trim()});
+  }
+  return items;
+}
 function parseGarra(txt){
   const rows=parseCSV(txt);
   let totalARS=null,equivUSD=null,eventos=[];
@@ -355,6 +372,11 @@ const FALLBACK={
     {quien:"Mariana",tipo:"Plan de Pensión",usd:6982.94,ars:9692332},
   ],
   garra:{totalARS:1854000,equivUSD:1100,eventos:[{num:1,ganancia:102000}]},
+  movimientos:[
+    {fecha:"14-ago-2026",tipo:"Venta",activo:"USDT",broker:"Nexo",cant:995.36,precio:1,total:995.36,notas:"Cierre parcial"},
+    {fecha:"12-ago-2026",tipo:"Venta",activo:"USDT",broker:"Nexo",cant:200,precio:1,total:200,notas:"Venta parcial"},
+    {fecha:"1-jul-2026",tipo:"Compra",activo:"USDT",broker:"Nexo",cant:1163.14,precio:1,total:1163.14,notas:""},
+  ],
 };
 let STATE={...FALLBACK,source:'empty'};
 
@@ -362,9 +384,9 @@ async function loadAll(){
   setStatus('cargando...','warn');
   document.getElementById('tab-portfolio').innerHTML='<div class="loading"><div class="spin">⟳</div><br>Actualizando...</div>';
   try{
-    const [csvCed,csvResto,csvArs,csvPen,csvGarra]=await Promise.all([fetchSheet('cedears'),fetchSheet('resto'),fetchSheet('ars'),fetchSheet('pension'),fetchSheet('garra')]);
+    const [csvCed,csvResto,csvArs,csvPen,csvGarra,csvMovs]=await Promise.all([fetchSheet('cedears'),fetchSheet('resto'),fetchSheet('ars'),fetchSheet('pension'),fetchSheet('garra'),fetchSheet('movimientos')]);
     const ced=parseCedears(csvCed);
-    STATE={mine:ced.mine,ali:ced.ali,cartera:ced.cartera,totales:ced.totales,resto:parseResto(csvResto),ars:parseArs(csvArs),pension:parsePension(csvPen),garra:parseGarra(csvGarra),source:'live'};
+    STATE={mine:ced.mine,ali:ced.ali,cartera:ced.cartera,totales:ced.totales,resto:parseResto(csvResto),ars:parseArs(csvArs),pension:parsePension(csvPen),garra:parseGarra(csvGarra),movimientos:parseMovs(csvMovs),source:'live'};
     setStatus('en vivo','live');
     document.getElementById('sync-time').textContent='actualizado '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
   }catch(e){
@@ -535,30 +557,28 @@ function renderPortfolio(){
       </div>
     </div>`;
 
-  // Consolidar por activo+broker: netear compras y ventas
+  // Consolidar por activo+broker (opción B: sin filas de venta, cada fila es viva)
   const posMap={};
   resto.forEach(r=>{
+    if(r.esVenta)return; // por compatibilidad: si quedara alguna vieja, se ignora acá
     const k=r.activo+'|'+r.broker;
-    if(!posMap[k])posMap[k]={activo:r.activo,broker:r.broker,cat:r.cat,valor_c:0,valor_a:0,pl:0,pl_ok:r.pl_ok,tieneVenta:false,fecha:r.fecha};
-    posMap[k].valor_c+=r.valor_c;
+    if(!posMap[k])posMap[k]={activo:r.activo,broker:r.broker,cat:r.cat,compras_c:0,valor_a:0,pl:0,pl_ok:r.pl_ok,fecha:r.fecha};
+    posMap[k].compras_c+=r.valor_c;
     posMap[k].valor_a+=r.valor_a;
-    if(r.pl_ok&&!r.esVenta)posMap[k].pl+=r.pl;
-    if(r.esVenta)posMap[k].tieneVenta=true;
-    if(!r.esVenta)posMap[k].cat=r.cat; // categoría de la compra, no "Venta"
+    if(r.pl_ok)posMap[k].pl+=r.pl;
+    posMap[k].cat=r.cat;
   });
   const posArr=Object.values(posMap);
-  // Vivas = valor actual > umbral pequeño. Cerradas = neteadas a ~0
-  const vivas=posArr.filter(p=>Math.abs(p.valor_a)>1);
-  const cerradas=posArr.filter(p=>Math.abs(p.valor_a)<=1);
+  const vivas=posArr.filter(p=>Math.abs(p.valor_a)>0.5);
+  const cerradas=posArr.filter(p=>Math.abs(p.valor_a)<=0.5);
 
   const noOk=vivas.filter(p=>!p.pl_ok).length;
   const rowsResto=vivas.map(p=>{
-    const plp=p.valor_c>0?(p.pl/p.valor_c*100):null;
+    const plp=p.compras_c>0?(p.pl/p.compras_c*100):null;
     const hasPL=p.pl_ok&&plp!=null;
     const bc=!hasPL?'bw':p.pl>=0?'bg':'br';
     const plCell=hasPL?`<span class="badge ${bc}">${pct(plp)}</span>`:`<span class="badge bw">⚠️ n/d</span>`;
-    const ventaTag=p.tieneVenta?` <span class="tag" style="color:var(--gold)">parcial</span>`:'';
-    return`<tr><td><span class="tk">${p.activo}</span>${ventaTag}</td><td><span class="tag">${p.broker}</span></td><td><span class="tag">${p.cat}</span></td><td class="r">${usd(p.valor_c)}</td><td class="r">${usd(p.valor_a)}</td><td class="r">${plCell}</td></tr>`;
+    return`<tr><td><span class="tk">${p.activo}</span></td><td><span class="tag">${p.broker}</span></td><td><span class="tag">${p.cat}</span></td><td class="r">${usd(p.compras_c)}</td><td class="r">${usd(p.valor_a)}</td><td class="r">${plCell}</td></tr>`;
   }).join('');
 
   const cerradasRow=cerradas.length?`<tr style="opacity:.5"><td colspan="6" style="padding-top:8px;font-size:10px;color:var(--dim)">🔒 ${cerradas.length} posición${cerradas.length>1?'es':''} cerrada${cerradas.length>1?'s':''}: ${cerradas.map(p=>p.activo+' ('+p.broker+')').join(', ')} — ver Movimientos</td></tr>`:'';
@@ -574,7 +594,7 @@ function renderPortfolio(){
     <div class="g2">
       <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Posiciones vivas</span><span class="badge bb">${vivas.length} activos</span></div>
         <div style="padding:0 14px 12px;overflow-x:auto"><table><thead><tr><th>Activo</th><th>Broker</th><th>Tipo</th><th class="r">Invertido</th><th class="r">Actual</th><th class="r">P&L</th></tr></thead><tbody>${rowsResto}${cerradasRow}</tbody>
-        <tfoot><tr style="border-top:1px solid var(--border)"><td colspan="3" class="muted" style="padding-top:8px">Total</td><td class="r muted" style="padding-top:8px">${usd(s(vivas,'valor_c'))}</td><td class="r" style="padding-top:8px">${usd(resTA)}</td><td class="r" style="padding-top:8px">—</td></tr></tfoot></table></div>
+        <tfoot><tr style="border-top:1px solid var(--border)"><td colspan="3" class="muted" style="padding-top:8px">Total</td><td class="r muted" style="padding-top:8px">${usd(s(vivas,'compras_c'))}</td><td class="r" style="padding-top:8px">${usd(resTA)}</td><td class="r" style="padding-top:8px">—</td></tr></tfoot></table></div>
       </div>
       <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">Por broker</span></div><div class="cb">${barsH2}</div></div>
     </div>`;
@@ -1147,14 +1167,7 @@ function renderGarra(){
 
 // ════════ TAB: MOVIMIENTOS ════════
 function renderMovimientos(){
-  const {mine,ali,resto,ars}=STATE;
-
-  // Unificar todos los movimientos con fecha parseada
-  const movs=[];
-  mine.forEach(o=>movs.push({fecha:o.fecha_c,activo:o.ticker,broker:o.broker,tipo:'Compra',monto:o.valor_c,cat:'CEDEAR',cuenta:'Portfolio'}));
-  ali.forEach(o=>movs.push({fecha:o.fecha_c,activo:o.ticker,broker:o.broker,tipo:'Compra',monto:o.valor_c,cat:'CEDEAR',cuenta:'Ali'}));
-  resto.forEach(r=>movs.push({fecha:r.fecha,activo:r.activo,broker:r.broker,tipo:r.esVenta?'Venta':'Compra',monto:r.valor_c,cat:r.cat,cuenta:'Resto'}));
-  (ars||[]).forEach(r=>movs.push({fecha:r.fecha,activo:r.activo,broker:r.broker,tipo:'Compra',monto:r.valor_c,cat:r.cat,cuenta:'ARS',esArs:true}));
+  const movs=(STATE.movimientos||[]).slice();
 
   // Ordenar por fecha desc
   movs.forEach(m=>m._d=parseDate(m.fecha));
@@ -1162,33 +1175,32 @@ function renderMovimientos(){
   const sinFecha=movs.filter(m=>!m._d);
   const ordenados=[...conFecha,...sinFecha];
 
-  const nCompras=movs.filter(m=>m.tipo==='Compra').length;
-  const nVentas=movs.filter(m=>m.tipo==='Venta').length;
+  const compras=movs.filter(m=>m.tipo.toLowerCase()==='compra');
+  const ventas=movs.filter(m=>m.tipo.toLowerCase()==='venta');
+  const totalComprado=compras.reduce((s,m)=>s+(m.total||0),0);
+  const totalVendido=ventas.reduce((s,m)=>s+(m.total||0),0);
 
   // Filtros
   const filtro=window._movFiltro||'todos';
   const filtrados=ordenados.filter(m=>{
-    if(filtro==='compras')return m.tipo==='Compra';
-    if(filtro==='ventas')return m.tipo==='Venta';
+    if(filtro==='compras')return m.tipo.toLowerCase()==='compra';
+    if(filtro==='ventas')return m.tipo.toLowerCase()==='venta';
     return true;
   });
 
-  const fmtMonto=(m)=>{
-    if(m.esArs)return arsFmt(Math.abs(m.monto));
-    return usd(Math.abs(m.monto));
-  };
-
   const rows=filtrados.map(m=>{
-    const esVenta=m.tipo==='Venta';
+    const esVenta=m.tipo.toLowerCase()==='venta';
     const icon=esVenta?'🔴':'🟢';
     const tipoColor=esVenta?'var(--warn)':'var(--accent)';
     return`<tr>
       <td style="white-space:nowrap"><span style="font-size:9px">${icon}</span> <span style="color:${tipoColor};font-family:var(--mono);font-size:10px">${m.tipo}</span></td>
       <td><span class="tk">${m.activo}</span></td>
       <td><span class="tag">${m.broker}</span></td>
-      <td><span class="tag">${m.cat}</span></td>
+      <td class="r muted" style="font-size:10px">${m.cant!=null?m.cant.toLocaleString('en-US',{maximumFractionDigits:6}):'—'}</td>
+      <td class="r muted" style="font-size:10px">${m.precio!=null?usd(m.precio):'—'}</td>
+      <td class="r" style="color:${esVenta?'var(--warn)':'var(--hi)'}">${esVenta?'−':''}${usd(m.total)}</td>
       <td class="r" style="color:var(--dim);font-size:10px">${m.fecha||'—'}</td>
-      <td class="r" style="color:${esVenta?'var(--warn)':'var(--hi)'}">${esVenta?'−':''}${fmtMonto(m)}</td>
+      <td style="font-size:10px;color:var(--dim)">${m.notas||''}</td>
     </tr>`;
   }).join('');
 
@@ -1196,13 +1208,13 @@ function renderMovimientos(){
 
   document.getElementById('tab-movimientos').innerHTML=`
     <div class="kpi-row">
-      <div class="kpi b"><div class="kl">Movimientos totales</div><div class="kv">${movs.length}</div><div class="ks muted">compras + ventas</div></div>
-      <div class="kpi g"><div class="kl">Compras</div><div class="kv">${nCompras}</div><div class="ks muted">entradas</div></div>
-      <div class="kpi o"><div class="kl">Ventas</div><div class="kv">${nVentas}</div><div class="ks muted">salidas</div></div>
-      <div class="kpi p"><div class="kl">Último movimiento</div><div class="kv" style="font-size:14px">${conFecha[0]?conFecha[0].activo:'—'}</div><div class="ks muted">${conFecha[0]?conFecha[0].fecha:''}</div></div>
+      <div class="kpi b"><div class="kl">Movimientos</div><div class="kv">${movs.length}</div><div class="ks muted">${compras.length} compras · ${ventas.length} ventas</div></div>
+      <div class="kpi g"><div class="kl">Total comprado</div><div class="kv" style="font-size:16px">${usd(totalComprado,0)}</div><div class="ks muted">bruto histórico</div></div>
+      <div class="kpi o"><div class="kl">Total vendido</div><div class="kv" style="font-size:16px">${usd(totalVendido,0)}</div><div class="ks muted">capital retirado</div></div>
+      <div class="kpi p"><div class="kl">Último movimiento</div><div class="kv" style="font-size:14px">${conFecha[0]?conFecha[0].activo+' · '+conFecha[0].tipo:'—'}</div><div class="ks muted">${conFecha[0]?conFecha[0].fecha:''}</div></div>
     </div>
 
-    <div class="notice-blue">📋 Diario de operaciones. Registro de cada compra y venta. Las ventas se descuentan del total del portfolio y no aparecen en "Posiciones vivas".</div>
+    <div class="notice-blue">📋 Diario de operaciones — bitácora manual de compras y ventas. Es tu registro histórico: no afecta el cálculo de posiciones vivas (esas salen de tus tenencias actuales). Cargá acá cada operación cuando la hacés.</div>
 
     <div class="card">
       <div class="ch">
@@ -1214,8 +1226,8 @@ function renderMovimientos(){
         </div>
       </div>
       <div style="padding:0 14px 12px;overflow-x:auto">
-        <table><thead><tr><th>Tipo</th><th>Activo</th><th>Broker</th><th>Categoría</th><th class="r">Fecha</th><th class="r">Monto</th></tr></thead>
-        <tbody>${rows||'<tr><td colspan="6" class="muted" style="text-align:center;padding:16px">Sin movimientos</td></tr>'}</tbody></table>
+        <table><thead><tr><th>Tipo</th><th>Activo</th><th>Broker</th><th class="r">Cantidad</th><th class="r">Precio</th><th class="r">Total</th><th class="r">Fecha</th><th>Notas</th></tr></thead>
+        <tbody>${rows||'<tr><td colspan="8" class="muted" style="text-align:center;padding:16px">Sin movimientos cargados aún</td></tr>'}</tbody></table>
       </div>
     </div>`;
 }
