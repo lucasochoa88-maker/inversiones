@@ -1,6 +1,39 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <script>
+  // Configuración
+  const PASSWORD_CORRECTA = "Bastian2024"; // Cambiá esto por la contraseña que quieras
+  const TELEGRAM_BOT_TOKEN = "8882581814:AAE6epEj2lRoGyme98Slcaik4P8zodXT0j4"; // Token de tu bot de Telegram
+  const TELEGRAM_CHAT_ID = "8882581814";     // Tu Chat ID de Telegram
+
+  function notificarTelegram(mensaje) {
+    if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return;
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: mensaje
+      })
+    }).catch(err => console.error("Error al enviar alerta:", err));
+  }
+
+  // Lógica de acceso
+  let passIngresada = prompt("Ingrese la contraseña de acceso al Dashboard:");
+
+  if (passIngresada === PASSWORD_CORRECTA) {
+    // Acceso permitido
+    notificarTelegram("🟢 Acceso AUTORIZADO al Dashboard de Finanzas.");
+  } else {
+    // Acceso denegado
+    notificarTelegram(`🚨 Intento de acceso FALLIDO al Dashboard. Intento con clave: "${passIngresada || 'vacío'}"`);
+    alert("Contraseña incorrecta. Acceso denegado.");
+    document.write("<h1 style='text-align:center; margin-top:50px; family-font:sans-serif;'>Acceso No Autorizado</h1>");
+    window.stop(); // Detiene la carga del resto del sitio
+  }
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Portfolio · Dashboard</title>
